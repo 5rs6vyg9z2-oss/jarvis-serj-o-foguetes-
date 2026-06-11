@@ -1,5 +1,8 @@
 import java.util.Scanner;
 import java.time.LocalDateTime;
+import java.io.file;
+import java.io.FileWriter;
+import java.io.IOException;
 //esses imports sao muito ruins de gravar, mas apartie de uma breve pesquisa voce consegue avançar, e entender como funciona.
 
 public class Jarvis {
@@ -7,6 +10,7 @@ public class Jarvis {
     public static void main(String[] args) {
 
         Scanner entrada = new Scanner(System.in);
+        // o scanner e uma classe que serve para ler a entrada do usuario, nesse caso ele vai ler o que o usuario digitar no console.
 
         System.out.println("olá, sou o sejão foguetes");
         System.out.println("qual seu nome meu nobre?");
@@ -66,95 +70,69 @@ public class Jarvis {
 
                 System.out.println("hoje é " + dia + "/" + mes + "/" + ano);
 
-                    } else if(resposta.contains("somar")) {
+            } else if (resposta.contains("+")) {
 
-                        String[] partes = resposta.split("somar");
-                        if (partes.length == 2) {
-                            String numeros = partes[1].trim();
-                            String[] numerosArray = numeros.split("e|,| ");
-                            int soma = 0;
-                            for (String num : numerosArray) {
-                                try {
-                                    soma += Integer.parseInt(num.trim());
-                                } catch (NumberFormatException e) {
-                                    // Ignorar valores que não são números
-                                }
-                            }
-                            System.out.println("a soma é: " + soma);
-                        } else {
-                            System.out.println("por favor, forneça os números para somar.");
-                        }
+                String[] partes = resposta.split("\\+");
 
+                if (partes.length == 2) {
 
-                    }else if(resposta.contains("multiplicar")) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
 
-                        String[] partes = resposta.split("multiplicar");
-                        if (partes.length == 2) {
-                            String numeros = partes[1].trim();
-                            String[] numerosArray = numeros.split("e|,| ");
-                            int produto = 1;
-                            for (String num : numerosArray) {
-                                try {
-                                    produto *= Integer.parseInt(num.trim());
-                                } catch (NumberFormatException e) {
-                                    // Ignorar valores que não são números
-                                }
-                            }
-                            System.out.println("o produto é: " + produto);
-                        } else {
-                            System.out.println("por favor, forneça os números para multiplicar.");
-                        }
+                    System.out.println("deixa eu calcular...");
+                    System.out.println("o resultado é: " + (n1 + n2));
+                }
 
+            } else if (resposta.contains("-")) {
 
-                    }else if(resposta.contains("dividir")) {
+                String[] partes = resposta.split("-");
 
-                        String[] partes = resposta.split("dividir");
-                        if (partes.length == 2) {
-                            String numeros = partes[1].trim();
-                            String[] numerosArray = numeros.split("e|,| ");
-                            if (numerosArray.length == 2) {
-                                try {
-                                    int num1 = Integer.parseInt(numerosArray[0].trim());
-                                    int num2 = Integer.parseInt(numerosArray[1].trim());
-                                    if (num2 != 0) {
-                                        double resultado = (double) num1 / num2;
-                                        System.out.println("o resultado da divisão é: " + resultado);
-                                    } else {
-                                        System.out.println("não é possível dividir por zero.");
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.out.println("por favor, forneça números válidos para dividir.");
-                                }
-                            } else {
-                                System.out.println("por favor, forneça exatamente dois números para dividir.");
-                            }
-                        } else {
-                            System.out.println("por favor, forneça os números para dividir.");
-                        }
+                if (partes.length == 2) {
 
-                    } else if(resposta.contains("subtrair")) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
 
-                        String[] partes = resposta.split("subtrair");
-                        if (partes.length == 2) {
-                            String numeros = partes[1].trim();
-                            String[] numerosArray = numeros.split("e|,| ");
-                            if (numerosArray.length == 2) {
-                                try {
-                                    int num1 = Integer.parseInt(numerosArray[0].trim());
-                                    int num2 = Integer.parseInt(numerosArray[1].trim());
-                                    int resultado = num1 - num2;
-                                    System.out.println("o resultado da subtração é: " + resultado);
-                                } catch (NumberFormatException e) {
-                                    System.out.println("por favor, forneça números válidos para subtrair.");
-                                }
-                            } else {
-                                System.out.println("por favor, forneça exatamente dois números para subtrair.");
-                            }
-                        } else {
-                            System.out.println("por favor, forneça os números para subtrair.");
-                        }
+                    System.out.println("deixa eu ver...");
+                    System.out.println("o resultado é: " + (n1 - n2));
+                }
 
-                // essas partes sao perguntas basicas de calculadora, mas podendo expandir isso npara div ersar coisas e contas mais complexas, mas esse e o começo esse codigo ainda deve ser bem alterado.
+            } else if (resposta.contains("*")) {
+
+                String[] partes = resposta.split("\\*");
+
+                if (partes.length == 2) {
+
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
+
+                    System.out.println("caraca mane...");
+                    System.out.println("o resultado é: " + (n1 * n2));
+                }
+
+            } else if (resposta.contains("/")) {
+
+                String[] partes = resposta.split("/");
+
+                if (partes.length == 2) {
+
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
+
+                    if (n2 != 0) {
+
+                        System.out.println("deixa eu calcular...");
+                        System.out.println("o resultado é: " + (n1 / n2));
+
+                    } else {
+
+                        System.out.println("não posso dividir por zero.");
+                    }
+                }
+
+            //resposta.contains basicamente identfica no que foi digitado pelo usuario e acha a "palavra chave" que nesse caso e o indicativo de que operação
+            // split separa os numeros para a operaçao, sem que a maquina peça pro usuario falar separadamente
+            //o legth e o idicativo que pra essas operacoes especificas ele precisa de uma quantidade especifica (como visto ai 2 numeros) se o usuario digitar algo errado como "13+" ele nao emite erro
+            //Já o parte converte o texto em numeros
 
             } else {
 
