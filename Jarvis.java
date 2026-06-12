@@ -1,22 +1,48 @@
 import java.util.Scanner;
 import java.time.LocalDateTime;
 import java.io.file;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 //esses imports sao muito ruins de gravar, mas apartie de uma breve pesquisa voce consegue avançar, e entender como funciona.
 
 public class Jarvis {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Scanner entrada = new Scanner(System.in);
         // o scanner e uma classe que serve para ler a entrada do usuario, nesse caso ele vai ler o que o usuario digitar no console.
+            
+             File arquivoUsuario = new File("usuario.txt");
 
-        System.out.println("olá, sou o sejão foguetes");
-        System.out.println("qual seu nome meu nobre?");
+            System.out.println("olá, sou o sejão foguetes");
+               
 
-        //essa parte e o unicio onde a IA se comunica e interaje com o usurio, a partir daqui ele começa a ajudar
-        String nome = entrada.nextLine();
+               String nome;
+
+              if (arquivoUsuario.exists()) {
+                 Scanner leitorArquivo = new Scanner(arquivoUsuario);
+
+                   nome = leitorArquivo.nextLine();
+
+                     System.out.println("olá novamente, " + nome + "!");
+
+                         leitorArquivo.close();
+
+                    } else {
+
+                         System.out.println("qual seu nome meu nobre?");
+
+                              nome = entrada.nextLine();
+
+                         FileWriter escritor = new FileWriter(arquivoUsuario);
+
+                             escritor.write(nome);
+
+                           escritor.close();
+}
+                     //essa parte e o inicio onde a IA se comunica e interaje com o usurio, a partir daqui ele começa a ajudar
+       
 
         //essa e sempre a entrada em rincipalmente java (nao que eu va usar ate porque eu to pra backand.)
         System.out.println("olá. muito prazer em conheccer, " + nome + "!");
@@ -145,3 +171,5 @@ public class Jarvis {
         entrada.close();
     }
 }
+
+   
