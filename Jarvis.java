@@ -80,23 +80,16 @@ public class Jarvis {
 
                 System.out.println("deixa eu ver...");
 
-                LocalDateTime agora = LocalDateTime.now();
-                int hora = agora.getHour();
-                int minuto = agora.getMinute();
-
-                System.out.println("são " + hora + ":" + minuto + " horas");
+                System.out.println("mostrando horário...");
+                mostrarHorario();
 
             } else if (resposta.contains("qual a data de hoje")
                     || resposta.contains("data")) {
 
                 System.out.println("deixa eu ver...");
 
-                LocalDateTime agora = LocalDateTime.now();
-                int dia = agora.getDayOfMonth();
-                int mes = agora.getMonthValue();
-                int ano = agora.getYear();
 
-                System.out.println("hoje é " + dia + "/" + mes + "/" + ano);
+               mostrarData();
 
             } else if (resposta.contains("+")) {
 
@@ -171,6 +164,29 @@ public class Jarvis {
         }
 
         entrada.close();
+    }
+
+    private static void extracted() {
+        mostrarHorario();
+    }
+
+    public static void mostrarHorario() {
+        LocalDateTime agora = LocalDateTime.now();
+        int hora = agora.getHour();
+        int minuto = agora.getMinute();
+
+        System.out.println("são " + hora + ":" + minuto + " horas");
+        
+    }
+
+    public static void mostrarData() {
+        LocalDateTime agora = LocalDateTime.now();
+        int dia = agora.getDayOfMonth();
+        int mes = agora.getMonthValue();
+        int ano = agora.getYear();
+
+        System.out.println("hoje é " + dia + "/" + mes + "/" + ano);
+
     }
 }
 
