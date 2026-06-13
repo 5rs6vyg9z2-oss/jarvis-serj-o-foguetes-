@@ -4,7 +4,7 @@ import java.io.file;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-//esses imports sao muito ruins de gravar, mas apartie de uma breve pesquisa voce consegue avançar, e entender como funciona.
+//esses imports sao muito ruins de gravar, mas apartir de uma breve pesquisa voce consegue avançar, e entender como funciona.
 
 public class Jarvis {
 
@@ -16,20 +16,21 @@ public class Jarvis {
              File arquivoUsuario = new File("usuario.txt");
 
             System.out.println("olá, sou o sejão foguetes");
-               
+            
 
                String nome;
 
               if (arquivoUsuario.exists()) {
                  Scanner leitorArquivo = new Scanner(arquivoUsuario);
-
+                      
                    nome = leitorArquivo.nextLine();
+                      System.out.println("olá novamente, " + nome + "!");
 
-                     System.out.println("olá novamente, " + nome + "!");
 
                          leitorArquivo.close();
 
                     } else {
+
 
                          System.out.println("qual seu nome meu nobre?");
 
@@ -39,14 +40,15 @@ public class Jarvis {
 
                              escritor.write(nome);
 
+                            System.out.println("olá. muito prazer em conheccer, " + nome + "!");
+
                            escritor.close();
 }
                      //essa parte e o inicio onde a IA se comunica e interaje com o usurio, a partir daqui ele começa a ajudar
        
 
         //essa e sempre a entrada em rincipalmente java (nao que eu va usar ate porque eu to pra backand.)
-        System.out.println("olá. muito prazer em conheccer, " + nome + "!");
-        System.out.println("digite 'sair' quando quiser encerrar.");
+          System.out.println("digite 'sair' quando quiser encerrar.");
 
         boolean primeirapergunta = true;
 
