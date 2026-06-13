@@ -1,5 +1,6 @@
-import java.util.Scanner;
+Eimport java.util.Scanner;
 import java.time.LocalDateTime;
+import java.io.file;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,17 +11,23 @@ public class Jarvis {
     public static void main(String[] args) throws Exception {
 
         Scanner entrada = new Scanner(System.in);
+        // o scanner e uma classe que serve para ler a entrada do usuario, nesse caso ele vai ler o que o usuario digitar no console.
+            
+             File arquivoUsuario = new File("usuario.txt");
 
-        File arquivoUsuario = new File("usuario.txt");
+            System.out.println("olá, sou o sejão foguetes");
+            
 
-        String nome;
+               String nome;
 
-        if (arquivoUsuario.exists()) {
-            Scanner leitorArquivo = new Scanner(arquivoUsuario);
-            nome = leitorArquivo.nextLine();
-            System.out.println("olá novamente, " + nome + "!");
-            leitorArquivo.close();
-        } else {
+              if (arquivoUsuario.exists()) {
+                nome = new Scanner(arquivoUsuario).nextLine();
+                      System.out.println("olá novamente, " + nome + "!");
+
+
+                         leitorArquivo.close();
+
+                    } else {
 
 
                          System.out.println("qual seu nome meu nobre?");
@@ -83,41 +90,38 @@ public class Jarvis {
                mostrarData();
 
             } else if (resposta.contains("+")) {
+
                 String[] partes = resposta.split("\\+");
 
-              calcularSoma(
-    Double.parseDouble(partes[0].trim()),
-    Double.parseDouble(partes[1].trim())
-);
-                
+                calcular(resposta);
+                }
 
             } else if (resposta.contains("-")) {
-                String[] partes = resposta.split("\\-");
 
-            calcularSubtracao(
-    Double.parseDouble(partes[0].trim()),
-    Double.parseDouble(partes[1].trim())
-);
-                
+                String[] partes = resposta.split("-");
+
+                calcular(resposta);
+                }
 
             } else if (resposta.contains("*")) {
+
                 String[] partes = resposta.split("\\*");
-                calcularMultiplicacao(
-    Double.parseDouble(partes[0].trim()),
-    Double.parseDouble(partes[1].trim())
-);
-                
+
+                calcular(resposta);
+                }
 
             } else if (resposta.contains("/")) {
+
                 String[] partes = resposta.split("/");
 
-              calcularDivisao(
-    Double.parseDouble(partes[0].trim()),
-    Double.parseDouble(partes[1].trim())
-);
-                
+                calcular(resposta);
 
-                
+                    } else {
+
+                        System.out.println("não posso dividir por zero.");
+                    }
+                }
+
             //resposta.contains basicamente identfica no que foi digitado pelo usuario e acha a "palavra chave" que nesse caso e o indicativo de que operação
             // split separa os numeros para a operaçao, sem que a maquina peça pro usuario falar separadamente
             //o legth e o idicativo que pra essas operacoes especificas ele precisa de uma quantidade especifica (como visto ai 2 numeros) se o usuario digitar algo errado como "13+" ele nao emite erro
@@ -157,31 +161,75 @@ public class Jarvis {
 
     }
 
-    public static void calcularSoma(double n1, double n2) {
-        System.out.println("deixa eu calcular...");
-        System.out.println("o resultado é: " + (n1 + n2));
-    }
+    public static void calcular(String resposta) {
+        if (resposta.contains("+")) {
 
-     public static void calcularSubtracao(double n1, double n2) {
-        System.out.println("deixa eu ver...");
-        System.out.println("o resultado é: " + (n1 - n2));
-    }
+            String[] partes = resposta.split("\\+");
 
-      public static void calcularMultiplicacao(double n1, double n2) {
-        System.out.println("caraca mane...");
-        System.out.println("o resultado é: " + (n1 * n2));
-    }
+            if (partes.length == 2) {
 
-       public static void calcularDivisao(double n1, double n2) {
-        if (n2 != 0) {
-            System.out.println("deixa eu calcular...");
-            System.out.println("o resultado é: " + (n1 / n2));
-        } else {
-            System.out.println("não posso dividir por zero.");
+                double n1 = Double.parseDouble(partes[0].trim());
+                double n2 = Double.parseDouble(partes[1].trim());
+
+                System.out.println("deixa eu calcular...");
+                System.out.println("o resultado é: " + (n1 + n2));
+            }
+
+        } else if (resposta.contains("-")) {
+
+            String[] partes = resposta.split("-");
+
+            if (partes.length == 2) {
+
+                double n1 = Double.parseDouble(partes[0].trim());
+                double n2 = Double.parseDouble(partes[1].trim());
+
+                System.out.println("deixa eu ver...");
+                System.out.println("o resultado é: " + (n1 - n2));
+            }
+
+        } else if (resposta.contains("*")) {
+
+            String[] partes = resposta.split("\\*");
+
+            if (partes.length == 2) {
+
+                double n1 = Double.parseDouble(partes[0].trim());
+                double n2 = Double.parseDouble(partes[1].trim());
+
+                System.out.println("caraca mane...");
+                System.out.println("o resultado é: " + (n1 * n2));
+            }
+
+        } else if (resposta.contains("/")) {
+
+            String[] partes = resposta.split("/");
+
+            if (partes.length == 2) {
+
+                double n1 = Double.parseDouble(partes[0].trim());
+                double n2 = Double.parseDouble(partes[1].trim());
+
+                if (n2 != 0) {
+
+                    System.out.println("deixa eu calcular...");
+                    System.out.println("o resultado é: " + (n1 / n2));
+
+                } else {
+
+                    System.out.println("não posso dividir por zero.");
+                }
+            }
+        }
+
+        public static void salvarUsuario(String nome) {
+            try {
+                FileWriter escritor = new FileWriter("usuario.txt");
+                escritor.write(nome);
+                escritor.close();
+            } catch (IOException e) {
+                System.out.println("Ocorreu um erro ao salvar o usuário: " + e.getMessage());
+            }
         }
 }
-
-
-
    
-}
