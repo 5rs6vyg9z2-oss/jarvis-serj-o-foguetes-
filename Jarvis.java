@@ -1,6 +1,3 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
@@ -10,12 +7,12 @@ public class Jarvis {
 
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
-        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios();
-        calculadora calculadora = new calculadora();
+        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios(ARQUIVO_USUARIOS);
+        Calculadora calculadora = new Calculadora();
 
         System.out.println("ola, sou o serjao foguetes");
 
-        String nome = iniciarSessao(entrada);
+        String nome = iniciarSessao(entrada, gerenciadorUsuarios);
 
         if (nome == null) {
             entrada.close();
@@ -54,251 +51,153 @@ public class Jarvis {
                     || comando.contains("data")) {
                 System.out.println("deixa eu ver...");
                 mostrarData();
-            } else if (comando.contains("+")
-                    || comando.contains("-")
-                    || comando.contains("*")
-                    || comando.contains("/")) {
-                calcular(comando);
+            } else if (calculadora.temOperacao(comando)) {
+                System.out.println(calculadora.calcular(comando));
             } else if (comando.equals("cadastrar usuario")) {
-                cadastrarUsuarioPeloTeclado(entrada);
+                cadastrarUsuarioPeloTeclado(entrada, gerenciadorUsuarios);
             } else if (comando.equals("listar usuarios")) {
-                listarUsuarios();
+                listarUsuarios(gerenciadorUsuarios);
             } else if (comando.equals("alterar nome")) {
-                listarUsuarios();
+                listarUsuarios(gerenciadorUsuarios);
 
                 System.out.println("digite o nome que deseja alterar:");
-                String nomeAntigo = entrada.nextLine();
+                String nomeAntigo = entrada.nextLine().trim();
 
                 System.out.println("digite o novo nome:");
-                String novoNome = entrada.nextLine();
+                String novoNome = entrada.nextLine().trim();
 
-                alterarUsuario(nomeAntigo, novoNome);
+                alterarUsuario(nomeAntigo, novoNome, gerenciadorUsuarios);
             } else if (comando.equals("excluir usuario")) {
-                listarUsuarios();
+                listarUsuarios(gerenciadorUsuarios);
 
                 System.out.println("digite o nome que deseja excluir:");
-                String nomeExcluir = entrada.nextLine();
+                String nomeExcluir = entrada.nextLine().trim();
 
-       while (true) {
-            
-                System.out.println("email ou senha incorretos.");
-            } else {
-                System.out.println("opcao nao reconhecida.");
-            }
-        }             excluirUsuario(nomeExcluir);
-            
+                excluirUsuario(nomeExcluir, gerenciadorUsuarios);
             } else if (comando.equals("alterar email")) {
-                listarUsuarios();
+                listarUsuarios(gerenciadorUsuarios);
 
                 System.out.println("digite o email que deseja alterar:");
-                String emailAntigo = entrada.nextLine();
+                String emailAntigo = entrada.nextLine().trim();
 
                 System.out.println("digite o novo email:");
-                String emailNovo = entrada.nextLine();
+                String emailNovo = entrada.nextLine().trim();
 
-                alterarEmail(emailAntigo, emailNovo);
-                
-            }else {
+                alterarEmail(emailAntigo, emailNovo, gerenciadorUsuarios);
+            } else {
                 System.out.println("desculpe, nao entendi o que voce quis dizer.");
-        
             }
-
-           
         }
 
         entrada.close();
     }
 
-    public static String iniciarSessao(Scanner entrada , GerenciadorUsuarios (()gerenciadorUsuarios) {
-            while (true) {
-                System.out.println("voce ja tem uma conta? (sim/nao)");
-                String resposta = entrada.nextLine().trim().toLowerCase();
-    
-                if (resposta.equals("sim")) {
-                    System.out.println("digite seu email:");
-                    String email = entrada.nextLine().trim();
-    
-                    System.out.println("digite sua senha:");
-                    String senha = entrada.nextLine().trim();
-    
-                    Usuario usuario = gerenciadorUsuarios.autenticar(email, senha);
-    
-                    if (usuario != null) {
-                        return usuario.getNome();
-                    } else {
-                        System.out.println("email ou senha incorretos. tente novamente.");
-                    }
-                } else if (resposta.equals("nao")) {
-                    return cadastrarUsuarioPeloTeclado(entrada, gerenciadorUsuarios);
-                } else {
-                    System.out.println("responda apenas com 'sim' ou 'nao'.");
-                }
-            }
-        
-        }
-    GerenciadorUsuario.cadastrarUsuario(usuario);
+    public static String iniciarSessao(Scanner entrada, GerenciadorUsuarios gerenciadorUsuarios) {
+        while (true) {
+            System.out.println("voce ja tem uma conta? (sim/nao/sair)");
+            String resposta = entrada.nextLine().trim().toLowerCase();
 
-   public static String fazerLogin(String email, String senha) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
-
-        if (!arquivoUsuarios.exists()) {
-            return null;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3 && partes[1].trim().equals(email) && partes[2].trim().equals(senha)) {
-                    leitor.close();
-                    return partes[0].trim(); // Retorna o nome do usuario
-                }
+            if (resposta.equals("sair")) {
+                System.out.println("ate logo!");
+                return null;
             }
 
-            leitor.close();
-        } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo de usuarios.");
-        }
+            if (resposta.equals("sim")) {
+                System.out.println("digite seu email:");
+                String email = entrada.nextLine().trim();
 
-        return null; // Retorna null se a autenticação falhar
-    }
+                System.out.println("digite sua senha:");
+                String senha = entrada.nextLine().trim();
 
-    public static boolean emailJaExiste(String email) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
+                Usuario usuario = gerenciadorUsuarios.autenticar(email, senha);
 
-        if (!arquivoUsuarios.exists()) {
-            return false;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3 && partes[1].trim().equals(email)) {
-                    leitor.close();
-                    return true;
+                if (usuario != null) {
+                    return usuario.getNome();
                 }
-            }
 
-            leitor.close();
-        } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo de usuarios.");
-        }
+                System.out.println("email ou senha incorretos. tente novamente.");
+            } else if (resposta.equals("nao")) {
+                String nome = cadastrarUsuarioPeloTeclado(entrada, gerenciadorUsuarios);
 
-        return false;
-    }
-
-    public static void listarUsuarios() {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
-
-        if (!arquivoUsuarios.exists()) {
-            System.out.println("Nenhum usuario cadastrado ainda.");
-            return;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-            System.out.println("Usuarios cadastrados:");
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3) {
-                    System.out.println("- " + partes[0]);
+                if (nome != null) {
+                    return nome;
                 }
-            }
-
-            leitor.close();
-        } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo de usuarios.");
-        }
-    }
-
-    public static void alterarUsuario(String nomeAntigo, String novoNome) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
-
-        if (!arquivoUsuarios.exists()) {
-            System.out.println("Nenhum usuario cadastrado para alterar.");
-            return;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-            StringBuilder conteudo = new StringBuilder();
-            boolean usuarioEncontrado = false;
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3 && partes[0].trim().equals(nomeAntigo)) {
-                    conteudo.append(novoNome).append(";").append(partes[1]).append(";").append(partes[2]).append("\n");
-                    usuarioEncontrado = true;
-                } else {
-                    conteudo.append(linha).append("\n");
-                }
-            }
-
-            leitor.close();
-
-            FileWriter escritor = new FileWriter(arquivoUsuarios);
-            escritor.write(conteudo.toString());
-            escritor.close();
-
-            if (usuarioEncontrado) {
-                System.out.println("Usuario alterado com sucesso: " + nomeAntigo + " para " + novoNome);
             } else {
-                System.out.println("Usuario nao encontrado: " + nomeAntigo);
+                System.out.println("responda apenas com 'sim', 'nao' ou 'sair'.");
             }
-        } catch (IOException e) {
-            System.out.println("Erro ao alterar usuario.");
         }
     }
 
-    public static void excluirUsuario(String nome) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
+    public static String cadastrarUsuarioPeloTeclado(Scanner entrada, GerenciadorUsuarios gerenciadorUsuarios) {
+        System.out.println("digite o nome do usuario:");
+        String nome = entrada.nextLine().trim();
 
-        if (!arquivoUsuarios.exists()) {
-            System.out.println("Nenhum usuario cadastrado para excluir.");
+        System.out.println("digite o email do usuario:");
+        String email = entrada.nextLine().trim();
+
+        System.out.println("digite a senha do usuario:");
+        String senha = entrada.nextLine().trim();
+
+        Usuario usuario = new Usuario(nome, email, senha);
+
+        if (gerenciadorUsuarios.adicionarUsuario(usuario)) {
+            System.out.println("usuario cadastrado com sucesso!");
+            return usuario.getNome();
+        }
+
+        System.out.println("nao foi possivel cadastrar o usuario. confira se os campos nao estao vazios ou se o email ja existe.");
+        return null;
+    }
+
+    public static void listarUsuarios(GerenciadorUsuarios gerenciadorUsuarios) {
+        if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
+            System.out.println("nenhum usuario cadastrado ainda.");
             return;
         }
 
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-            StringBuilder conteudo = new StringBuilder();
-            boolean usuarioEncontrado = false;
+        System.out.println("usuarios cadastrados:");
 
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
+        for (Usuario usuario : gerenciadorUsuarios.getUsuarios()) {
+            System.out.println("- " + usuario.getNome());
+        }
+    }
 
-                if (partes.length == 3 && partes[0].trim().equals(nome)) {
-                    usuarioEncontrado = true;
-                } else {
-                    conteudo.append(linha).append("\n");
-                }
-            }
+    public static void alterarUsuario(String nomeAntigo, String novoNome, GerenciadorUsuarios gerenciadorUsuarios) {
+        if (novoNome.isEmpty()) {
+            System.out.println("o novo nome nao pode ficar vazio.");
+            return;
+        }
 
-            leitor.close();
+        if (gerenciadorUsuarios.alterarNome(nomeAntigo, novoNome)) {
+            System.out.println("usuario alterado com sucesso: " + nomeAntigo + " para " + novoNome);
+        } else {
+            System.out.println("usuario nao encontrado: " + nomeAntigo);
+        }
+    }
 
-            FileWriter escritor = new FileWriter(arquivoUsuarios);
-            escritor.write(conteudo.toString());
-            escritor.close();
+    public static void excluirUsuario(String nome, GerenciadorUsuarios gerenciadorUsuarios) {
+        if (gerenciadorUsuarios.excluirUsuarioPorNome(nome)) {
+            System.out.println("usuario excluido com sucesso: " + nome);
+        } else {
+            System.out.println("usuario nao encontrado: " + nome);
+        }
+    }
 
-            if (usuarioEncontrado) {
-                System.out.println("Usuario excluido com sucesso: " + nome);
-            } else {
-                System.out.println("Usuario nao encontrado: " + nome);
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao excluir usuario.");
+    public static void alterarEmail(String emailAntigo, String emailNovo, GerenciadorUsuarios gerenciadorUsuarios) {
+        if (emailNovo.isEmpty()) {
+            System.out.println("o novo email nao pode ficar vazio.");
+            return;
+        }
+
+        if (!emailAntigo.equals(emailNovo) && gerenciadorUsuarios.emailJaExiste(emailNovo)) {
+            System.out.println("ja existe um usuario cadastrado com esse email.");
+            return;
+        }
+
+        if (gerenciadorUsuarios.alterarEmail(emailAntigo, emailNovo)) {
+            System.out.println("email alterado com sucesso: " + emailAntigo + " para " + emailNovo);
+        } else {
+            System.out.println("usuario nao encontrado com email: " + emailAntigo);
         }
     }
 
@@ -318,63 +217,4 @@ public class Jarvis {
 
         System.out.println("hoje e " + dia + "/" + mes + "/" + ano);
     }
-
-    public static void calcular(String resposta) {
-        try {
-            if (resposta.contains("+")) {
-                
-                return calculadora.calcular(resposta);
-            
-            } else if (resposta.contains("-")) {
-                return calculadora.calcular(resposta);
-            
-            } else if (resposta.contains("*")) {
-                return calculadora.calcular(resposta);
-            
-            } else if (resposta.contains("/")) {
-                return calculadora.calcular(resposta);
-            }
-        
-
-    public static void alterarEmail(String emailAntigo, String emailNovo) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
-
-        if (!arquivoUsuarios.exists()) {
-            System.out.println("Nenhum usuario cadastrado para alterar.");
-            return;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-            StringBuilder conteudo = new StringBuilder();
-            boolean usuarioEncontrado = false;
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3 && partes[1].trim().equals(emailAntigo)) {
-                    conteudo.append(partes[0]).append(";").append(emailNovo).append(";").append(partes[2]).append("\n");
-                    usuarioEncontrado = true;
-                } else {
-                    conteudo.append(linha).append("\n");
-                }
-            }
-
-            leitor.close();
-
-            FileWriter escritor = new FileWriter(arquivoUsuarios);
-            escritor.write(conteudo.toString());
-            escritor.close();
-
-            if (usuarioEncontrado) {
-                System.out.println("Email alterado com sucesso: " + emailAntigo + " para " + emailNovo);
-            } else {
-                System.out.println("Usuario nao encontrado com email: " + emailAntigo);
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao alterar email do usuario.");
-        }
-    }
-
 }

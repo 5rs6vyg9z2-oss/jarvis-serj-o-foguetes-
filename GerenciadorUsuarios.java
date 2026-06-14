@@ -1,61 +1,16 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class GerenciadorUsuarios {
     private List<Usuario> usuarios;
-    private String caminhoArquivo;
+    private UsuarioRepository usuarioRepository;
 
     public GerenciadorUsuarios() {
         this("usuarios.txt");
     }
 
     public GerenciadorUsuarios(String caminhoArquivo) {
-        this.caminhoArquivo = caminhoArquivo;
-        this.usuarios = new ArrayList<>();
-        carregarUsuarios();
-    }
-
-    private void carregarUsuarios() {
-        File arquivoUsuarios = new File(caminhoArquivo);
-
-        if (!arquivoUsuarios.exists()) {
-            return;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                Usuario usuario = Usuario.criarPelaLinha(linha);
-
-                if (usuario != null) {
-                    usuarios.add(usuario);
-                }
-            }
-
-            leitor.close();
-        } catch (IOException e) {
-            System.out.println("erro ao carregar usuarios.");
-        }
-    }
-
-    private void salvarUsuarios() {
-        try {
-            FileWriter escritor = new FileWriter(caminhoArquivo);
-
-            for (Usuario usuario : usuarios) {
-                escritor.write(usuario.transformarEmLinha() + "\n");
-            }
-
-            escritor.close();
-        } catch (IOException e) {
-            System.out.println("erro ao salvar usuarios.");
-        }
+        this.usuarioRepository = new UsuarioRepository(caminhoArquivo);
+        this.usuarios = usuarioRepository.listarTodos();
     }
 
     public boolean adicionarUsuario(Usuario usuario) {
@@ -63,22 +18,29 @@ public class GerenciadorUsuarios {
             return false;
         }
 
-        if (usuario.getNome().isEmpty() || usuario.getEmail().isEmpty() || usuario.getSenha().isEmpty()) {
+        String nome = limparTexto(usuario.getNome());
+        String email = limparTexto(usuario.getEmail());
+        String senha = limparTexto(usuario.getSenha());
+
+        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
             return false;
         }
 
-        if (emailJaExiste(usuario.getEmail())) {
+        if (emailJaExiste(email)) {
             return false;
         }
 
-        usuarios.add(usuario);
+        usuarios.add(new Usuario(nome, email, senha));
         salvarUsuarios();
         return true;
     }
 
     public Usuario autenticar(String email, String senha) {
+        String emailLimpo = limparTexto(email);
+        String senhaLimpa = limparTexto(senha);
+
         for (Usuario usuario : usuarios) {
-            if (usuario.getEmail().equals(email) && usuario.getSenha().equals(senha)) {
+            if (usuario.getEmail().equals(emailLimpo) && usuario.getSenha().equals(senhaLimpa)) {
                 return usuario;
             }
         }
@@ -105,15 +67,21 @@ public class GerenciadorUsuarios {
     }
 
     public void atualizarUsuario(Usuario usuario, String novoNome, String novoEmail, String novaSenha) {
-        usuario.setNome(novoNome);
-        usuario.setEmail(novoEmail);
-        usuario.setSenha(novaSenha);
+        if (usuario == null) {
+            return;
+        }
+
+        usuario.setNome(limparTexto(novoNome));
+        usuario.setEmail(limparTexto(novoEmail));
+        usuario.setSenha(limparTexto(novaSenha));
         salvarUsuarios();
     }
 
     public Usuario buscarUsuarioPorEmail(String email) {
+        String emailLimpo = limparTexto(email);
+
         for (Usuario usuario : usuarios) {
-            if (usuario.getEmail().equals(email)) {
+            if (usuario.getEmail().equals(emailLimpo)) {
                 return usuario;
             }
         }
@@ -126,19 +94,34 @@ public class GerenciadorUsuarios {
     }
 
     public void alterarSenha(Usuario usuario, String novaSenha) {
-        usuario.setSenha(novaSenha);
+        if (usuario == null) {
+            return;
+        }
+
+        usuario.setSenha(limparTexto(novaSenha));
         salvarUsuarios();
     }
 
     public void alterarNome(Usuario usuario, String novoNome) {
-        usuario.setNome(novoNome);
+        if (usuario == null) {
+            return;
+        }
+
+        usuario.setNome(limparTexto(novoNome));
         salvarUsuarios();
     }
 
     public boolean alterarNome(String nomeAntigo, String novoNome) {
+        String nomeAntigoLimpo = limparTexto(nomeAntigo);
+        String novoNomeLimpo = limparTexto(novoNome);
+
+        if (novoNomeLimpo.isEmpty()) {
+            return false;
+        }
+
         for (Usuario usuario : usuarios) {
-            if (usuario.getNome().equals(nomeAntigo)) {
-                usuario.setNome(novoNome);
+            if (usuario.getNome().equals(nomeAntigoLimpo)) {
+                usuario.setNome(novoNomeLimpo);
                 salvarUsuarios();
                 return true;
             }
@@ -148,26 +131,35 @@ public class GerenciadorUsuarios {
     }
 
     public boolean alterarEmail(String emailAntigo, String emailNovo) {
-        Usuario usuario = buscarUsuarioPorEmail(emailAntigo);
+        String emailAntigoLimpo = limparTexto(emailAntigo);
+        String emailNovoLimpo = limparTexto(emailNovo);
+
+        if (emailNovoLimpo.isEmpty()) {
+            return false;
+        }
+
+        Usuario usuario = buscarUsuarioPorEmail(emailAntigoLimpo);
 
         if (usuario == null) {
             return false;
         }
 
-        if (!emailAntigo.equals(emailNovo) && emailJaExiste(emailNovo)) {
+        if (!emailAntigoLimpo.equals(emailNovoLimpo) && emailJaExiste(emailNovoLimpo)) {
             return false;
         }
 
-        usuario.setEmail(emailNovo);
+        usuario.setEmail(emailNovoLimpo);
         salvarUsuarios();
         return true;
     }
 
     public boolean excluirUsuarioPorNome(String nome) {
+        String nomeLimpo = limparTexto(nome);
+
         for (int i = 0; i < usuarios.size(); i++) {
             Usuario usuario = usuarios.get(i);
 
-            if (usuario.getNome().equals(nome)) {
+            if (usuario.getNome().equals(nomeLimpo)) {
                 usuarios.remove(i);
                 salvarUsuarios();
                 return true;
@@ -175,5 +167,17 @@ public class GerenciadorUsuarios {
         }
 
         return false;
+    }
+
+    private void salvarUsuarios() {
+        usuarioRepository.salvarTodos(usuarios);
+    }
+
+    private String limparTexto(String texto) {
+        if (texto == null) {
+            return "";
+        }
+
+        return texto.trim();
     }
 }
