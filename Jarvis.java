@@ -1,145 +1,82 @@
-Eimport java.util.Scanner;
-import java.time.LocalDateTime;
-import java.io.file;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-//esses imports sao muito ruins de gravar, mas apartir de uma breve pesquisa voce consegue avançar, e entender como funciona.
+import java.time.LocalDateTime;
+import java.util.Scanner;
 
+// Esses imports sao chatos de gravar, mas com pesquisa voce vai entendendo como funciona.
 public class Jarvis {
 
     public static void main(String[] args) throws Exception {
-
         Scanner entrada = new Scanner(System.in);
-        // o scanner e uma classe que serve para ler a entrada do usuario, nesse caso ele vai ler o que o usuario digitar no console.
-            
-             File arquivoUsuario = new File("usuario.txt");
+        File arquivoUsuario = new File("usuario.txt");
 
-            System.out.println("olá, sou o sejão foguetes");
-            
+        System.out.println("ola, sou o serjão foguetes");
 
-               String nome;
+        String nome;
 
-              if (arquivoUsuario.exists()) {
-                nome = new Scanner(arquivoUsuario).nextLine();
-                      System.out.println("olá novamente, " + nome + "!");
+        if (arquivoUsuario.exists()) {
+            Scanner leitorArquivo = new Scanner(arquivoUsuario);
 
+            if (leitorArquivo.hasNextLine()) {
+                nome = leitorArquivo.nextLine();
+            } else {
+                System.out.println("qual seu nome meu nobre?");
+                nome = entrada.nextLine();
+                salvarUsuario(nome);
+            }
 
-                         leitorArquivo.close();
+            leitorArquivo.close();
+            System.out.println("ola novamente, " + nome + "!");
+        } else {
+            System.out.println("qual seu nome meu nobre?");
+            nome = entrada.nextLine();
+            salvarUsuario(nome);
 
-                    } else {
+            System.out.println("ola. muito prazer em conhecer, " + nome + "!");
+        }
 
+        System.out.println("digite 'sair' quando quiser encerrar.");
 
-                         System.out.println("qual seu nome meu nobre?");
-
-                              nome = entrada.nextLine();
-
-                         FileWriter escritor = new FileWriter(arquivoUsuario);
-
-                             escritor.write(nome);
-
-                            System.out.println("olá. muito prazer em conheccer, " + nome + "!");
-
-                           escritor.close();
-}
-                     //essa parte e o inicio onde a IA se comunica e interaje com o usurio, a partir daqui ele começa a ajudar
-       
-
-        //essa e sempre a entrada em rincipalmente java (nao que eu va usar ate porque eu to pra backand.)
-          System.out.println("digite 'sair' quando quiser encerrar.");
-
-        boolean primeirapergunta = true;
+        boolean primeiraPergunta = true;
 
         while (true) {
-        // a while true e um loop infinito.. (mas bom) ele vai ficar rodando o codigo dentro dele ate o usuario digitar "sair" e ai ele vai encerrar o programa.
-
-            if (primeirapergunta) {
+            if (primeiraPergunta) {
                 System.out.println("em que posso te ajudar?");
-                primeirapergunta = false;
+                primeiraPergunta = false;
             } else {
                 System.out.println("te ajudo em algo mais?");
             }
 
             String resposta = entrada.nextLine();
 
-            // aparentemente o boolean e uma variavel queso e verdadeira ou falsa, e nesse caso ele serva pra controlar a primeira pergunta, para que seja diferente
-            // de outras perguntas e nao pareça robotico, e sim mais natural.
-
             if (resposta.equalsIgnoreCase("sair")
-                    || resposta.equalsIgnoreCase("até")
+                    || resposta.equalsIgnoreCase("ate")
                     || resposta.equalsIgnoreCase("obrigado")) {
-
-                System.out.println("até logo, " + nome + "!");
+                System.out.println("ate logo, " + nome + "!");
                 break;
             }
 
-            if (resposta.contains("que horas são")
+            if (resposta.contains("que horas sao")
                     || resposta.contains("horas")) {
-
                 System.out.println("deixa eu ver...");
-
-                System.out.println("mostrando horário...");
+                System.out.println("mostrando horario...");
                 mostrarHorario();
-
             } else if (resposta.contains("qual a data de hoje")
                     || resposta.contains("data")) {
-
                 System.out.println("deixa eu ver...");
-
-
-               mostrarData();
-
-            } else if (resposta.contains("+")) {
-
-                String[] partes = resposta.split("\\+");
-
+                mostrarData();
+            } else if (resposta.contains("+")
+                    || resposta.contains("-")
+                    || resposta.contains("*")
+                    || resposta.contains("/")) {
                 calcular(resposta);
-                }
-
-            } else if (resposta.contains("-")) {
-
-                String[] partes = resposta.split("-");
-
-                calcular(resposta);
-                }
-
-            } else if (resposta.contains("*")) {
-
-                String[] partes = resposta.split("\\*");
-
-                calcular(resposta);
-                }
-
-            } else if (resposta.contains("/")) {
-
-                String[] partes = resposta.split("/");
-
-                calcular(resposta);
-
-                    } else {
-
-                        System.out.println("não posso dividir por zero.");
-                    }
-                }
-
-            //resposta.contains basicamente identfica no que foi digitado pelo usuario e acha a "palavra chave" que nesse caso e o indicativo de que operação
-            // split separa os numeros para a operaçao, sem que a maquina peça pro usuario falar separadamente
-            //o legth e o idicativo que pra essas operacoes especificas ele precisa de uma quantidade especifica (como visto ai 2 numeros) se o usuario digitar algo errado como "13+" ele nao emite erro
-            //Já o parte converte o texto em numeros
-
             } else {
-
-                System.out.println("desculpe, não entendi o que você quis dizer.");
+                System.out.println("desculpe, nao entendi o que voce quis dizer.");
             }
-
-            //essa parte e para dar uma resposta mais natural, e nao parecer que a IA esta apenas respondendo perguntas, mas sim que ela esta interagindo com o usuario.
         }
 
         entrada.close();
-    }
-
-    private static void extracted() {
-        mostrarHorario();
     }
 
     public static void mostrarHorario() {
@@ -147,8 +84,7 @@ public class Jarvis {
         int hora = agora.getHour();
         int minuto = agora.getMinute();
 
-        System.out.println("são " + hora + ":" + minuto + " horas");
-        
+        System.out.println("sao " + hora + ":" + minuto + " horas");
     }
 
     public static void mostrarData() {
@@ -157,79 +93,88 @@ public class Jarvis {
         int mes = agora.getMonthValue();
         int ano = agora.getYear();
 
-        System.out.println("hoje é " + dia + "/" + mes + "/" + ano);
-
+        System.out.println("hoje e " + dia + "/" + mes + "/" + ano);
     }
 
     public static void calcular(String resposta) {
-        if (resposta.contains("+")) {
+        try {
+            if (resposta.contains("+")) {
+                String[] partes = resposta.split("\\+");
 
-            String[] partes = resposta.split("\\+");
-
-            if (partes.length == 2) {
-
-                double n1 = Double.parseDouble(partes[0].trim());
-                double n2 = Double.parseDouble(partes[1].trim());
-
-                System.out.println("deixa eu calcular...");
-                System.out.println("o resultado é: " + (n1 + n2));
-            }
-
-        } else if (resposta.contains("-")) {
-
-            String[] partes = resposta.split("-");
-
-            if (partes.length == 2) {
-
-                double n1 = Double.parseDouble(partes[0].trim());
-                double n2 = Double.parseDouble(partes[1].trim());
-
-                System.out.println("deixa eu ver...");
-                System.out.println("o resultado é: " + (n1 - n2));
-            }
-
-        } else if (resposta.contains("*")) {
-
-            String[] partes = resposta.split("\\*");
-
-            if (partes.length == 2) {
-
-                double n1 = Double.parseDouble(partes[0].trim());
-                double n2 = Double.parseDouble(partes[1].trim());
-
-                System.out.println("caraca mane...");
-                System.out.println("o resultado é: " + (n1 * n2));
-            }
-
-        } else if (resposta.contains("/")) {
-
-            String[] partes = resposta.split("/");
-
-            if (partes.length == 2) {
-
-                double n1 = Double.parseDouble(partes[0].trim());
-                double n2 = Double.parseDouble(partes[1].trim());
-
-                if (n2 != 0) {
+                if (partes.length == 2) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
 
                     System.out.println("deixa eu calcular...");
-                    System.out.println("o resultado é: " + (n1 / n2));
-
+                    System.out.println("o resultado e: " + (n1 + n2));
                 } else {
+                    System.out.println("digite uma soma com dois numeros, tipo 10+5.");
+                }
+            } else if (resposta.contains("-")) {
+                String[] partes = resposta.split("-");
 
-                    System.out.println("não posso dividir por zero.");
+                if (partes.length == 2) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
+
+                    System.out.println("deixa eu ver...");
+                    System.out.println("o resultado e: " + (n1 - n2));
+                } else {
+                    System.out.println("digite uma subtracao com dois numeros, tipo 10-5.");
+                }
+            } else if (resposta.contains("*")) {
+                String[] partes = resposta.split("\\*");
+
+                if (partes.length == 2) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
+
+                    System.out.println("caraca mane...");
+                    System.out.println("o resultado e: " + (n1 * n2));
+                } else {
+                    System.out.println("digite uma multiplicacao com dois numeros, tipo 10*5.");
+                }
+            } else if (resposta.contains("/")) {
+                String[] partes = resposta.split("/");
+
+                if (partes.length == 2) {
+                    double n1 = Double.parseDouble(partes[0].trim());
+                    double n2 = Double.parseDouble(partes[1].trim());
+
+                    if (n2 != 0) {
+                        System.out.println("deixa eu calcular...");
+                        System.out.println("o resultado e: " + (n1 / n2));
+                    } else {
+                        System.out.println("nao posso dividir por zero.");
+                    }
+                } else {
+                    System.out.println("digite uma divisao com dois numeros, tipo 10/5.");
                 }
             }
+        } catch (NumberFormatException e) {
+            System.out.println("nao consegui entender os numeros dessa conta.");
         }
+    }
 
-        public static void salvarUsuario(String nome) {
-            try {
-                FileWriter escritor = new FileWriter("usuario.txt");
-                escritor.write(nome);
-                escritor.close();
-            } catch (IOException e) {
-                System.out.println("Ocorreu um erro ao salvar o usuário: " + e.getMessage());
-            }
+    public static void salvarUsuario(String nome) {
+        try {
+            FileWriter escritor = new FileWriter("usuario.txt");
+            escritor.write(nome);
+            escritor.close();
+        } catch (IOException e) {
+            System.out.println("Ocorreu um erro ao salvar o usuario: " + e.getMessage());
         }
+    }
+
+    public static void cadastrarUsuario(String nome) {
+        try {
+            FileWriter escritor = new FileWriter("usuarios.txt", true);
+            escritor.write(nome + "\n");
+            escritor.close();
+
+            System.out.println("Usuario cadastrado com sucesso: " + nome);
+        } catch (IOException e) {
+            System.out.println("Erro ao cadastrar usuario.");
+        }
+    }
 }
-   
