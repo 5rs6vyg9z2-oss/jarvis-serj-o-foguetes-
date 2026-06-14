@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
-// Esses imports sao chatos de gravar, mas com pesquisa voce vai entendendo como funciona.
 public class Jarvis {
 
     public static void main(String[] args) throws Exception {
         Scanner entrada = new Scanner(System.in);
         File arquivoUsuario = new File("usuario.txt");
 
-        System.out.println("ola, sou o serjão foguetes");
+        System.out.println("ola, sou o serjao foguetes");
 
         String nome;
 
@@ -71,6 +70,23 @@ public class Jarvis {
                     || resposta.contains("*")
                     || resposta.contains("/")) {
                 calcular(resposta);
+            } else if (resposta.equalsIgnoreCase("cadastrar usuario")) {
+                System.out.println("digite o nome do usuario que deseja cadastrar:");
+                String nomeUsuario = entrada.nextLine();
+                cadastrarUsuario(nomeUsuario);
+            } else if (resposta.equalsIgnoreCase("listar usuarios")) {
+                listarUsuarios();
+            } else if (resposta.equalsIgnoreCase("alterar nome")) {
+                System.out.println("usuarios cadastrados:");
+                listarUsuarios();
+
+                System.out.println("digite o nome que deseja alterar:");
+                String nomeAntigo = entrada.nextLine();
+
+                System.out.println("digite o novo nome:");
+                String novoNome = entrada.nextLine();
+
+                alterarUsuario(nomeAntigo, novoNome);
             } else {
                 System.out.println("desculpe, nao entendi o que voce quis dizer.");
             }
@@ -177,4 +193,118 @@ public class Jarvis {
             System.out.println("Erro ao cadastrar usuario.");
         }
     }
+
+    public static void listarUsuarios() {
+        File arquivoUsuarios = new File("usuarios.txt");
+
+        if (arquivoUsuarios.exists()) {
+            try {
+                Scanner leitor = new Scanner(arquivoUsuarios);
+                System.out.println("Usuarios cadastrados:");
+
+                while (leitor.hasNextLine()) {
+                    String usuario = leitor.nextLine();
+                    System.out.println("- " + usuario);
+                }
+
+                leitor.close();
+            } catch (IOException e) {
+                System.out.println("Erro ao ler o arquivo de usuarios.");
+            }
+        } else {
+            System.out.println("Nenhum usuario cadastrado ainda.");
+        }
+    }
+
+    public static void alterarUsuario(String nomeAntigo, String novoNome) {
+        File arquivoUsuarios = new File("usuarios.txt");
+
+        if (arquivoUsuarios.exists()) {
+            try {
+                Scanner leitor = new Scanner(arquivoUsuarios);
+                StringBuilder conteudo = new StringBuilder();
+                boolean usuarioEncontrado = false;
+
+                while (leitor.hasNextLine()) {
+                    String usuario = leitor.nextLine();
+
+                    if (usuario.equals(nomeAntigo)) {
+                        conteudo.append(novoNome).append("\n");
+                        usuarioEncontrado = true;
+                    } else {
+                        conteudo.append(usuario).append("\n");
+                    }
+                }
+
+                leitor.close();
+
+                FileWriter escritor = new FileWriter(arquivoUsuarios);
+                escritor.write(conteudo.toString());
+                escritor.close();
+
+                if (usuarioEncontrado) {
+                    System.out.println("Usuario alterado com sucesso: " + nomeAntigo + " para " + novoNome);
+                } else {
+                    System.out.println("Usuario nao encontrado: " + nomeAntigo);
+                }
+            } catch (IOException e) {
+                System.out.println("Erro ao alterar usuario.");
+            }
+        } else {
+            System.out.println("Nenhum usuario cadastrado para alterar.");
+        }
+    }
+    public static void excluirUsuario(String nome) {
+        File arquivoUsuarios = new File("usuarios.txt");
+
+        if (arquivoUsuarios.exists()) {
+            try {
+                Scanner leitor = new Scanner(arquivoUsuarios);
+                StringBuilder conteudo = new StringBuilder();
+                boolean usuarioEncontrado = false;
+
+                while (leitor.hasNextLine()) {
+                    String usuario = leitor.nextLine();
+
+                    if (usuario.equals(nome)) {
+                        usuarioEncontrado = true;
+                    } else {
+                        conteudo.append(usuario).append("\n");
+                    }
+                }
+
+                leitor.close();
+
+                FileWriter escritor = new FileWriter(arquivoUsuarios);
+                escritor.write(conteudo.toString());
+                escritor.close();
+
+                if (usuarioEncontrado) {
+                    System.out.println("Usuario excluido com sucesso: " + nome);
+                } else {
+                    System.out.println("Usuario nao encontrado: " + nome);
+                }
+            } catch (IOException e) {
+                System.out.println("Erro ao excluir usuario.");
+            }
+        } else {
+            System.out.println("Nenhum usuario cadastrado para excluir.");
+        }
+    }
+     public static void cadastrarUsuario(email.String email) {
+        try {
+            FileWriter escritor = new FileWriter("usuarios.txt", true);
+            escritor.write(email + "\n");
+            escritor.close();
+
+            public static void cadastrarUsuario(String senha){
+                try {
+                    FileWriter escritor = new FileWriter("usuarios.txt", true);
+                    escritor.write(senha + "\n");
+                    escritor.close();}
+
+            System.out.println("Usuario cadastrado com sucesso: " + email + " e senha: " + senha);
+        } catch (IOException e) {
+            System.out.println("Erro ao cadastrar usuario.");
+        }
 }
