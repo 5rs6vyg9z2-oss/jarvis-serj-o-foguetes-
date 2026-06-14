@@ -171,32 +171,11 @@ public class Jarvis {
             return false;
         }
     }
+     Usuario usuario = new Usuario(nome, email, senha);
 
-    public static String fazerLogin(String email, String senha) {
-        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
+    if (usuario == null) {
+        return null;
 
-        if (!arquivoUsuarios.exists()) {
-            System.out.println("Nenhum usuario cadastrado ainda.");
-            return null;
-        }
-
-        try {
-            Scanner leitor = new Scanner(arquivoUsuarios);
-
-            while (leitor.hasNextLine()) {
-                String linha = leitor.nextLine();
-                String[] partes = linha.split(";");
-
-                if (partes.length == 3) {
-                    String nomeCadastrado = partes[0].trim();
-                    String emailCadastrado = partes[1].trim();
-                    String senhaCadastrada = partes[2].trim();
-
-                    if (emailCadastrado.equals(email) && senhaCadastrada.equals(senha)) {
-                        leitor.close();
-                        return nomeCadastrado;
-                    }
-                }
             }
 
             leitor.close();
@@ -460,4 +439,5 @@ public class Jarvis {
             System.out.println("Erro ao alterar email do usuario.");
         }
     }
+
 }
