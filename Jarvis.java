@@ -10,6 +10,7 @@ public class Jarvis {
 
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
+        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios();
 
         System.out.println("ola, sou o serjao foguetes");
 
@@ -77,7 +78,13 @@ public class Jarvis {
                 System.out.println("digite o nome que deseja excluir:");
                 String nomeExcluir = entrada.nextLine();
 
-                excluirUsuario(nomeExcluir);
+       while (true) {
+            
+                System.out.println("email ou senha incorretos.");
+            } else {
+                System.out.println("opcao nao reconhecida.");
+            }
+        }             excluirUsuario(nomeExcluir);
             
             } else if (comando.equals("alterar email")) {
                 listarUsuarios();
@@ -96,86 +103,58 @@ public class Jarvis {
             }
 
            
-
-        }entrada.close();
-    }
-
-    public static String iniciarSessao(Scanner entrada) {
-        while (true) {
-            System.out.println("digite 'login' para entrar, 'cadastrar usuario' para criar conta ou 'sair' para encerrar:");
-            String opcao = entrada.nextLine().trim().toLowerCase();
-
-            if (opcao.equals("sair")) {
-                System.out.println("ate logo!");
-                return null;
-            }
-
-            if (opcao.equals("cadastrar usuario")) {
-                String nome = cadastrarUsuarioPeloTeclado(entrada);
-
-                if (nome != null) {
-                    return nome;
-                }
-            } else if (opcao.equals("login")) {
-                System.out.println("digite seu email:");
-                String email = entrada.nextLine();
-
-                System.out.println("digite sua senha:");
-                String senha = entrada.nextLine();
-
-                String nome = fazerLogin(email, senha);
-
-                if (nome != null) {
-                    return nome;
-                }
-
-                System.out.println("email ou senha incorretos.");
-            } else {
-                System.out.println("opcao nao reconhecida.");
-            }
-        }
-    }
-
-    public static String cadastrarUsuarioPeloTeclado(Scanner entrada) {
-        System.out.println("digite o nome do usuario:");
-        String nome = entrada.nextLine();
-
-        System.out.println("digite o email do usuario:");
-        String email = entrada.nextLine();
-
-        System.out.println("digite a senha do usuario:");
-        String senha = entrada.nextLine();
-
-        if (cadastrarUsuario(nome, email, senha)) {
-            return nome;
         }
 
-        return null;
+        entrada.close();
     }
 
-    public static boolean cadastrarUsuario(String nome, String email, String senha) {
-        if (emailJaExiste(email)) {
-            System.out.println("ja existe um usuario cadastrado com esse email.");
-            return false;
+    public static String iniciarSessao(Scanner entrada , GerenciadorUsuarios (()gerenciadorUsuarios) {
+            while (true) {
+                System.out.println("voce ja tem uma conta? (sim/nao)");
+                String resposta = entrada.nextLine().trim().toLowerCase();
+    
+                if (resposta.equals("sim")) {
+                    System.out.println("digite seu email:");
+                    String email = entrada.nextLine().trim();
+    
+                    System.out.println("digite sua senha:");
+                    String senha = entrada.nextLine().trim();
+    
+                    Usuario usuario = gerenciadorUsuarios.autenticar(email, senha);
+    
+                    if (usuario != null) {
+                        return usuario.getNome();
+                    } else {
+                        System.out.println("email ou senha incorretos. tente novamente.");
+                    }
+                } else if (resposta.equals("nao")) {
+                    return cadastrarUsuarioPeloTeclado(entrada, gerenciadorUsuarios);
+                } else {
+                    System.out.println("responda apenas com 'sim' ou 'nao'.");
+                }
+            }
+        
+        }
+    GerenciadorUsuario.cadastrarUsuario(usuario);
+
+   public static String fazerLogin(String email, String senha) {
+        File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
+
+        if (!arquivoUsuarios.exists()) {
+            return null;
         }
 
         try {
-            FileWriter escritor = new FileWriter(ARQUIVO_USUARIOS, true);
-            escritor.write(nome + ";" + email + ";" + senha + "\n");
-            escritor.close();
+            Scanner leitor = new Scanner(arquivoUsuarios);
 
-            System.out.println("Usuario cadastrado com sucesso: " + nome);
-            return true;
-        } catch (IOException e) {
-            System.out.println("Erro ao cadastrar usuario.");
-            return false;
-        }
-    }
-     Usuario usuario = new Usuario(nome, email, senha);
+            while (leitor.hasNextLine()) {
+                String linha = leitor.nextLine();
+                String[] partes = linha.split(";");
 
-    if (usuario == null) {
-        return null;
-
+                if (partes.length == 3 && partes[1].trim().equals(email) && partes[2].trim().equals(senha)) {
+                    leitor.close();
+                    return partes[0].trim(); // Retorna o nome do usuario
+                }
             }
 
             leitor.close();
@@ -183,7 +162,7 @@ public class Jarvis {
             System.out.println("Erro ao ler o arquivo de usuarios.");
         }
 
-        return null;
+        return null; // Retorna null se a autenticação falhar
     }
 
     public static boolean emailJaExiste(String email) {

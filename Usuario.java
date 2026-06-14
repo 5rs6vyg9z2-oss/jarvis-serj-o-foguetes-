@@ -29,6 +29,10 @@ public class Usuario {
         this.email = email;
     }
 
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
     public String transformarEmLinha() {
         return nome + ";" + email + ";" + senha;
     }
