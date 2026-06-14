@@ -11,6 +11,7 @@ public class Jarvis {
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
         GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios();
+        calculadora calculadora = new calculadora();
 
         System.out.println("ola, sou o serjao foguetes");
 
@@ -321,62 +322,19 @@ public class Jarvis {
     public static void calcular(String resposta) {
         try {
             if (resposta.contains("+")) {
-                String[] partes = resposta.split("\\+");
-
-                if (partes.length == 2) {
-                    double n1 = Double.parseDouble(partes[0].trim());
-                    double n2 = Double.parseDouble(partes[1].trim());
-
-                    System.out.println("deixa eu calcular...");
-                    System.out.println("o resultado e: " + (n1 + n2));
-                } else {
-                    System.out.println("digite uma soma com dois numeros, tipo 10+5.");
-                }
+                
+                return calculadora.calcular(resposta);
+            
             } else if (resposta.contains("-")) {
-                String[] partes = resposta.split("-");
-
-                if (partes.length == 2) {
-                    double n1 = Double.parseDouble(partes[0].trim());
-                    double n2 = Double.parseDouble(partes[1].trim());
-
-                    System.out.println("deixa eu ver...");
-                    System.out.println("o resultado e: " + (n1 - n2));
-                } else {
-                    System.out.println("digite uma subtracao com dois numeros, tipo 10-5.");
-                }
+                return calculadora.calcular(resposta);
+            
             } else if (resposta.contains("*")) {
-                String[] partes = resposta.split("\\*");
-
-                if (partes.length == 2) {
-                    double n1 = Double.parseDouble(partes[0].trim());
-                    double n2 = Double.parseDouble(partes[1].trim());
-
-                    System.out.println("caraca mane...");
-                    System.out.println("o resultado e: " + (n1 * n2));
-                } else {
-                    System.out.println("digite uma multiplicacao com dois numeros, tipo 10*5.");
-                }
+                return calculadora.calcular(resposta);
+            
             } else if (resposta.contains("/")) {
-                String[] partes = resposta.split("/");
-
-                if (partes.length == 2) {
-                    double n1 = Double.parseDouble(partes[0].trim());
-                    double n2 = Double.parseDouble(partes[1].trim());
-
-                    if (n2 != 0) {
-                        System.out.println("deixa eu calcular...");
-                        System.out.println("o resultado e: " + (n1 / n2));
-                    } else {
-                        System.out.println("nao posso dividir por zero.");
-                    }
-                } else {
-                    System.out.println("digite uma divisao com dois numeros, tipo 10/5.");
-                }
+                return calculadora.calcular(resposta);
             }
-        } catch (NumberFormatException e) {
-            System.out.println("nao consegui entender os numeros dessa conta.");
-        }
-    }
+        
 
     public static void alterarEmail(String emailAntigo, String emailNovo) {
         File arquivoUsuarios = new File(ARQUIVO_USUARIOS);
