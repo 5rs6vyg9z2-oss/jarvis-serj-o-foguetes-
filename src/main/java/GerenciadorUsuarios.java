@@ -1,18 +1,17 @@
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
 public class GerenciadorUsuarios {
     private List<Usuario> usuarios;
-    
-    @Autowired
     private UsuarioRepository usuarioRepository;
 
     public GerenciadorUsuarios() {
+        this("jarvis.db");
     }
 
-    @Autowired
+    public GerenciadorUsuarios(String caminhoBanco) {
+        this(new UsuarioRepository(caminhoBanco));
+    }
+
     public GerenciadorUsuarios(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
         this.usuarios = usuarioRepository.listarTodos();

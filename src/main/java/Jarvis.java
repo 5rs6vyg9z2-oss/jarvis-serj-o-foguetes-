@@ -1,29 +1,17 @@
-import java.time.LocalDateTime;
 import java.util.Scanner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@SpringBootApplication
-public class Jarvis implements CommandLineRunner {
+public class Jarvis {
 
     private static final String CAMINHO_BANCO = "jarvis.db";
 
-    @Autowired
-    private GerenciadorUsuarios gerenciadorUsuarios;
-
-    private Calculadora calculadora;
-    private Scanner entrada;
-
     public static void main(String[] args) {
-        SpringApplication.run(Jarvis.class, args);
+        JanelaJarvis.main(args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        entrada = new Scanner(System.in);
-        calculadora = new Calculadora();
+    public static void iniciarPeloTerminal(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios(CAMINHO_BANCO);
+        Calculadora calculadora = new Calculadora();
 
         System.out.println("ola, sou o serjao foguetes");
 
@@ -58,9 +46,9 @@ public class Jarvis implements CommandLineRunner {
             }
 
             if (comando.contains("que horas sao")
-                    || comando.contains("horas")) {
+                    || comando.contains("horas")
+                    || comando.contains("hora")) {
                 System.out.println("deixa eu ver...");
-                System.out.println("mostrando horario...");
                 mostrarHorario();
             } else if (comando.contains("qual a data de hoje")
                     || comando.contains("data")) {
@@ -217,19 +205,10 @@ public class Jarvis implements CommandLineRunner {
     }
 
     public static void mostrarHorario() {
-        LocalDateTime agora = LocalDateTime.now();
-        int hora = agora.getHour();
-        int minuto = agora.getMinute();
-
-        System.out.println("sao " + hora + ":" + minuto + " horas");
+        System.out.println("sao " + Datahora.obterHorarioAtual());
     }
 
     public static void mostrarData() {
-        LocalDateTime agora = LocalDateTime.now();
-        int dia = agora.getDayOfMonth();
-        int mes = agora.getMonthValue();
-        int ano = agora.getYear();
-
-        System.out.println("hoje e " + dia + "/" + mes + "/" + ano);
+        System.out.println("hoje e " + Datahora.obterDataAtual());
     }
 }
