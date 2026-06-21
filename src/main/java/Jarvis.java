@@ -1,14 +1,29 @@
 import java.time.LocalDateTime;
 import java.util.Scanner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class Jarvis {
+@SpringBootApplication
+public class Jarvis implements CommandLineRunner {
 
     private static final String CAMINHO_BANCO = "jarvis.db";
 
+    @Autowired
+    private GerenciadorUsuarios gerenciadorUsuarios;
+
+    private Calculadora calculadora;
+    private Scanner entrada;
+
     public static void main(String[] args) {
-        Scanner entrada = new Scanner(System.in);
-        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios(CAMINHO_BANCO);
-        Calculadora calculadora = new Calculadora();
+        SpringApplication.run(Jarvis.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        entrada = new Scanner(System.in);
+        calculadora = new Calculadora();
 
         System.out.println("ola, sou o serjao foguetes");
 
