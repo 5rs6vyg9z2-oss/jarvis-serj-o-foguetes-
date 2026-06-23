@@ -1,13 +1,16 @@
 import java.util.Scanner;
 
+// Porta de entrada do projeto: hoje abre a janela, mas ainda guarda o modo terminal.
 public class Jarvis {
 
     private static final String CAMINHO_BANCO = "jarvis.db";
 
+    // O main oficial chama a interface grafica.
     public static void main(String[] args) {
         JanelaJarvis.main(args);
     }
 
+    // Mantido para estudo e comparacao com a versao antiga via terminal.
     public static void iniciarPeloTerminal(String[] args) {
         Scanner entrada = new Scanner(System.in);
         GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios(CAMINHO_BANCO);
@@ -17,6 +20,7 @@ public class Jarvis {
 
         String nome = iniciarSessao(entrada, gerenciadorUsuarios);
 
+        // Quando iniciarSessao retorna null, significa que o usuario escolheu sair.
         if (nome == null) {
             entrada.close();
             return;
@@ -38,6 +42,7 @@ public class Jarvis {
             String resposta = entrada.nextLine();
             String comando = resposta.trim().toLowerCase();
 
+            // Normalizar para minusculo deixa o comando aceitar "Sair", "SAIR" etc.
             if (comando.equals("sair")
                     || comando.equals("ate")
                     || comando.equals("obrigado")) {
@@ -95,6 +100,7 @@ public class Jarvis {
         entrada.close();
     }
 
+    // Faz o fluxo de login/cadastro no terminal antes de liberar os comandos.
     public static String iniciarSessao(Scanner entrada, GerenciadorUsuarios gerenciadorUsuarios) {
         while (true) {
             System.out.println("voce ja tem uma conta? (sim/nao/sair)");
@@ -131,6 +137,7 @@ public class Jarvis {
         }
     }
 
+    // Cadastra pelo terminal e devolve o nome para iniciar a conversa.
     public static String cadastrarUsuarioPeloTeclado(Scanner entrada, GerenciadorUsuarios gerenciadorUsuarios) {
         System.out.println("digite o nome do usuario:");
         String nome = entrada.nextLine().trim();
@@ -152,6 +159,7 @@ public class Jarvis {
         return null;
     }
 
+    // Mostra apenas nomes, porque email e senha nao devem aparecer numa listagem comum.
     public static void listarUsuarios(GerenciadorUsuarios gerenciadorUsuarios) {
         if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
             System.out.println("nenhum usuario cadastrado ainda.");
@@ -165,6 +173,7 @@ public class Jarvis {
         }
     }
 
+    // Adaptador do terminal para a regra real que esta em GerenciadorUsuarios.
     public static void alterarUsuario(String nomeAntigo, String novoNome, GerenciadorUsuarios gerenciadorUsuarios) {
         if (novoNome.isEmpty()) {
             System.out.println("o novo nome nao pode ficar vazio.");
@@ -178,6 +187,7 @@ public class Jarvis {
         }
     }
 
+    // Remove usuario usando o gerenciador para tambem salvar a mudanca no banco.
     public static void excluirUsuario(String nome, GerenciadorUsuarios gerenciadorUsuarios) {
         if (gerenciadorUsuarios.excluirUsuarioPorNome(nome)) {
             System.out.println("usuario excluido com sucesso: " + nome);
@@ -186,6 +196,7 @@ public class Jarvis {
         }
     }
 
+    // Valida o novo email antes de pedir a troca ao gerenciador.
     public static void alterarEmail(String emailAntigo, String emailNovo, GerenciadorUsuarios gerenciadorUsuarios) {
         if (emailNovo.isEmpty()) {
             System.out.println("o novo email nao pode ficar vazio.");
@@ -204,6 +215,7 @@ public class Jarvis {
         }
     }
 
+    // Metodos pequenos deixam o comando principal mais facil de ler.
     public static void mostrarHorario() {
         System.out.println("sao " + Datahora.obterHorarioAtual());
     }

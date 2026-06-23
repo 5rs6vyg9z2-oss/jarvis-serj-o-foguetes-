@@ -7,18 +7,23 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+// Repository: camada responsavel por salvar e buscar usuarios no banco SQLite.
 public class UsuarioRepository {
+    // Caminho do arquivo .db que o SQLite usa para guardar os dados.
     private String caminhoBanco;
 
+    // Construtor padrao usado pelo projeto real.
     public UsuarioRepository() {
         this("jarvis.db");
     }
 
+    // Construtor com caminho facilita testes ou troca de banco no futuro.
     public UsuarioRepository(String caminhoBanco) {
         this.caminhoBanco = caminhoBanco;
         criarTabela();
     }
 
+    // Le todos os usuarios do banco e coloca em uma lista na memoria.
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT nome, email, senha FROM usuarios";
@@ -41,11 +46,13 @@ public class UsuarioRepository {
         return usuarios;
     }
 
+    // Salva a lista inteira de usuarios no banco em uma unica transacao.
     public void salvarTodos(List<Usuario> usuarios) {
         String apagarSql = "DELETE FROM usuarios";
         String inserirSql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
 
         try (Connection conexao = conectar()) {
+            // AutoCommit falso permite confirmar tudo junto ou desfazer se der erro.
             conexao.setAutoCommit(false);
 
             try (Statement apagar = conexao.createStatement();
@@ -71,6 +78,7 @@ public class UsuarioRepository {
         }
     }
 
+    // Busca um usuario pelo email usando PreparedStatement para evitar SQL montado na mao.
     public Usuario buscarPorEmail(String email) {
         String sql = "SELECT nome, email, senha FROM usuarios WHERE email = ?";
 
@@ -95,10 +103,12 @@ public class UsuarioRepository {
         return null;
     }
 
+    // Abre uma conexao JDBC com o arquivo SQLite configurado.
     private Connection conectar() throws SQLException {
         return DriverManager.getConnection("jdbc:sqlite:" + caminhoBanco);
     }
 
+    // Garante que a tabela exista antes do gerenciador tentar usar o banco.
     private void criarTabela() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS usuarios (

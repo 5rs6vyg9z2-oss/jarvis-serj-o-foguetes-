@@ -22,11 +22,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+// Interface grafica principal do Jarvis, feita com Java Swing.
 public class JanelaJarvis {
+    // Nomes das telas usadas pelo CardLayout para alternar entre login, cadastro e chat.
     private static final String TELA_LOGIN = "login";
     private static final String TELA_CADASTRO = "cadastro";
     private static final String TELA_CHAT = "chat";
 
+    // Paleta visual da janela. Usar constantes evita repetir cores pelo codigo.
     private static final Color FUNDO = new Color(9, 12, 18);
     private static final Color PAINEL = new Color(18, 24, 34);
     private static final Color CAMPO = new Color(28, 36, 50);
@@ -36,33 +39,42 @@ public class JanelaJarvis {
     private static final Color DESTAQUE_ESCURO = new Color(14, 116, 144);
     private static final Color BORDA = new Color(45, 56, 74);
 
+    // Componentes principais da janela.
     private JFrame janela;
     private JPanel painelPrincipal;
     private CardLayout cardLayout;
 
+    // Campos da tela de login.
     private JTextField campoEmailLogin;
     private JPasswordField campoSenhaLogin;
 
+    // Campos da tela de cadastro.
     private JTextField campoNomeCadastro;
     private JTextField campoEmailCadastro;
     private JPasswordField campoSenhaCadastro;
 
+    // Componentes da tela de conversa.
     private JTextArea areaConversa;
     private JTextField campoMensagem;
     private JLabel labelUsuarioLogado;
 
+    // Classes de regra: a tela chama essas classes em vez de fazer tudo sozinha.
     private GerenciadorUsuarios gerenciadorUsuarios;
-    private Calculadora calculadora;
+    private JarvisService jarvisService;
     private Usuario usuarioLogado;
+
+    // Guarda o passo atual quando um comando precisa de mais de uma resposta.
     private String acaoPendente = "";
     private String nomeTemporario = "";
     private String emailTemporario = "";
 
+    // O construtor prepara as dependencias que a janela vai usar.
     public JanelaJarvis() {
         gerenciadorUsuarios = new GerenciadorUsuarios();
-        calculadora = new Calculadora();
+        jarvisService = new JarvisService(gerenciadorUsuarios);
     }
 
+    // invokeLater cria a tela na thread correta do Swing.
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JanelaJarvis app = new JanelaJarvis();
@@ -70,6 +82,7 @@ public class JanelaJarvis {
         });
     }
 
+    // Monta a janela, adiciona as telas e mostra o login primeiro.
     public void iniciar() {
         janela = new JFrame("Jarvis");
         janela.setSize(980, 680);
@@ -90,6 +103,7 @@ public class JanelaJarvis {
         janela.setVisible(true);
     }
 
+    // Tela inicial: usuario informa email e senha ou vai para cadastro.
     private JPanel criarTelaLogin() {
         JPanel tela = criarTelaCentralizada();
         JPanel cartao = criarCartao(420);
@@ -124,6 +138,7 @@ public class JanelaJarvis {
         return tela;
     }
 
+    // Tela de cadastro: cria uma nova conta e ja entra no chat se der certo.
     private JPanel criarTelaCadastro() {
         JPanel tela = criarTelaCentralizada();
         JPanel cartao = criarCartao(420);
@@ -160,6 +175,7 @@ public class JanelaJarvis {
         return tela;
     }
 
+    // Tela principal depois do login: historico da conversa e campo de envio.
     private JPanel criarTelaChat() {
         JPanel tela = new JPanel(new BorderLayout(0, 0));
         tela.setBackground(FUNDO);
@@ -202,6 +218,7 @@ public class JanelaJarvis {
 
         campoMensagem = criarCampoTexto();
         campoMensagem.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        // ActionListener no campo faz a tecla Enter enviar a mensagem.
         campoMensagem.addActionListener(evento -> enviarMensagem());
 
         tela.add(topo, BorderLayout.NORTH);
@@ -211,6 +228,7 @@ public class JanelaJarvis {
         return tela;
     }
 
+    // Le os campos de login, valida e pede autenticacao ao GerenciadorUsuarios.
     private void entrar() {
         String email = campoEmailLogin.getText().trim();
         String senha = new String(campoSenhaLogin.getPassword()).trim();
@@ -229,6 +247,7 @@ public class JanelaJarvis {
         abrirChat(usuario);
     }
 
+    // Le os campos de cadastro, cria Usuario e salva usando o gerenciador.
     private void cadastrar() {
         String nome = campoNomeCadastro.getText().trim();
         String email = campoEmailCadastro.getText().trim();
@@ -248,6 +267,7 @@ public class JanelaJarvis {
         abrirChat(usuario);
     }
 
+    // Validacao de tela: impede chamar o gerenciador com campos vazios ou email invalido.
     private boolean dadosLoginValidos(String email, String senha) {
         if (email.isEmpty()) {
             mostrarAviso("Digite seu email.");
@@ -267,6 +287,7 @@ public class JanelaJarvis {
         return true;
     }
 
+    // Cadastro reaproveita a validacao do login e ainda confere nome e email repetido.
     private boolean dadosCadastroValidos(String nome, String email, String senha) {
         if (nome.isEmpty()) {
             mostrarAviso("Digite seu nome.");
@@ -285,16 +306,19 @@ public class JanelaJarvis {
         return true;
     }
 
+    // Regex simples para verificar se o texto tem formato basico de email.
     private boolean emailValido(String email) {
         return email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
     }
 
+    // Prepara a sessao do usuario e muda a tela para o chat.
     private void abrirChat(Usuario usuario) {
         usuarioLogado = usuario;
         labelUsuarioLogado.setText("Conectado como " + usuarioLogado.getNome());
 
         areaConversa.setText("");
         areaConversa.append("Jarvis: Ola, " + usuarioLogado.getNome() + ". Como posso ajudar?\n");
+        areaConversa.append("Jarvis: exemplo de coisas que posso fazer..\n");
         areaConversa.append("Jarvis: Voce pode perguntar a hora, a data ou digitar uma conta.\n");
         areaConversa.append("Jarvis: Tambem aceito: cadastrar usuario, listar usuarios, alterar nome, alterar email e excluir usuario.\n");
 
@@ -303,6 +327,7 @@ public class JanelaJarvis {
         SwingUtilities.invokeLater(() -> campoMensagem.requestFocusInWindow());
     }
 
+    // Envia a mensagem: mostra o texto do usuario, calcula resposta e atualiza o historico.
     private void enviarMensagem() {
         String mensagem = campoMensagem.getText().trim();
 
@@ -318,9 +343,11 @@ public class JanelaJarvis {
         areaConversa.setCaretPosition(areaConversa.getDocument().getLength());
     }
 
+    // Decide qual classe ou fluxo deve responder cada comando digitado.
     private String responder(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 
+        // Se existe uma acao em andamento, a proxima mensagem continua esse fluxo.
         if (!acaoPendente.isEmpty()) {
             return continuarAcaoPendente(mensagem);
         }
@@ -333,30 +360,19 @@ public class JanelaJarvis {
             return "ate logo, " + nome + "!";
         }
 
-        if (comando.contains("hora")) {
-            return "agora sao " + Datahora.obterHorarioAtual();
-        }
+        String respostaDoServico = jarvisService.responder(mensagem);
 
-        if (comando.contains("data")) {
-            return "hoje e " + Datahora.obterDataAtual();
-        }
+        if (respostaDoServico != null) {
+            if (usuarioLogado != null) {
+                labelUsuarioLogado.setText("Conectado como " + usuarioLogado.getNome());
+            }
 
-        if (calculadora.temOperacao(comando)) {
-            return calculadora.calcular(comando);
+            return respostaDoServico;
         }
 
         if (comando.equals("cadastrar usuario")) {
             acaoPendente = "cadastrar_nome";
             return "digite o nome do usuario:";
-        }
-
-        if (comando.equals("listar usuarios")) {
-            return listarUsuariosNaTela();
-        }
-
-        if (comando.equals("alterar nome")) {
-            acaoPendente = "alterar_nome_antigo";
-            return listarUsuariosNaTela() + "\nDigite o nome que deseja alterar:";
         }
 
         if (comando.equals("excluir usuario")) {
@@ -372,6 +388,7 @@ public class JanelaJarvis {
         return "ainda estou aprendendo a responder isso.";
     }
 
+    // Controla comandos em etapas, como cadastrar usuario ou alterar email pelo chat.
     private String continuarAcaoPendente(String mensagem) {
         String resposta = mensagem.trim();
 
@@ -414,35 +431,6 @@ public class JanelaJarvis {
             }
 
             return "nao foi possivel cadastrar o usuario.";
-        }
-
-        if (acaoPendente.equals("alterar_nome_antigo")) {
-            if (resposta.isEmpty()) {
-                return "digite o nome que deseja alterar:";
-            }
-
-            nomeTemporario = resposta;
-            acaoPendente = "alterar_nome_novo";
-            return "digite o novo nome:";
-        }
-
-        if (acaoPendente.equals("alterar_nome_novo")) {
-            if (resposta.isEmpty()) {
-                return "o novo nome nao pode ficar vazio. Digite o novo nome:";
-            }
-
-            boolean alterado = gerenciadorUsuarios.alterarNome(nomeTemporario, resposta);
-            limparAcaoPendente();
-
-            if (alterado) {
-                if (usuarioLogado != null) {
-                    labelUsuarioLogado.setText("Conectado como " + usuarioLogado.getNome());
-                }
-
-                return "usuario alterado com sucesso: " + nomeTemporario + " para " + resposta;
-            }
-
-            return "usuario nao encontrado: " + nomeTemporario;
         }
 
         if (acaoPendente.equals("excluir_nome")) {
@@ -500,6 +488,7 @@ public class JanelaJarvis {
         return "nao consegui continuar essa acao.";
     }
 
+    // Monta um texto amigavel com os usuarios sem mostrar email e senha.
     private String listarUsuariosNaTela() {
         if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
             return "nenhum usuario cadastrado ainda.";
@@ -514,6 +503,7 @@ public class JanelaJarvis {
         return texto.toString();
     }
 
+    // Encerra a sessao atual e volta para o login.
     private void sairDaSessao() {
         limparAcaoPendente();
         usuarioLogado = null;
@@ -523,6 +513,7 @@ public class JanelaJarvis {
         SwingUtilities.invokeLater(() -> campoEmailLogin.requestFocusInWindow());
     }
 
+    // Helper visual: cria uma tela com conteudo centralizado.
     private JPanel criarTelaCentralizada() {
         JPanel tela = new JPanel(new GridBagLayout());
         tela.setBackground(FUNDO);
@@ -530,6 +521,7 @@ public class JanelaJarvis {
         return tela;
     }
 
+    // Helper visual: cartao usado nas telas de login e cadastro.
     private JPanel criarCartao(int largura) {
         JPanel cartao = new JPanel(new GridBagLayout());
         cartao.setBackground(PAINEL);
@@ -540,6 +532,7 @@ public class JanelaJarvis {
         return cartao;
     }
 
+    // Helpers abaixo padronizam componentes para a tela manter a mesma identidade visual.
     private JLabel criarTitulo(String texto) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
         label.setForeground(TEXTO);
@@ -600,6 +593,7 @@ public class JanelaJarvis {
         return botao;
     }
 
+    // Adiciona label e campo sempre na mesma estrutura do GridBagLayout.
     private void adicionarCampo(JPanel painel, String texto, JTextField campo, int linha) {
         JLabel label = new JLabel(texto);
         label.setForeground(TEXTO_FRACO);
@@ -608,6 +602,7 @@ public class JanelaJarvis {
         adicionarLinha(painel, campo, linha + 1);
     }
 
+    // Configura uma linha do GridBagLayout sem repetir o mesmo bloco toda hora.
     private void adicionarLinha(JPanel painel, Component componente, int linha) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -618,6 +613,7 @@ public class JanelaJarvis {
         painel.add(componente, gbc);
     }
 
+    // Cria espacos invisiveis para respirar entre os campos.
     private void adicionarEspaco(JPanel painel, int linha, int altura) {
         JPanel espaco = new JPanel();
         espaco.setOpaque(false);
@@ -625,6 +621,7 @@ public class JanelaJarvis {
         adicionarLinha(painel, espaco, linha);
     }
 
+    // Limpa os campos para nao reaproveitar texto de uma tentativa anterior.
     private void limparLogin() {
         campoEmailLogin.setText("");
         campoSenhaLogin.setText("");
@@ -636,12 +633,14 @@ public class JanelaJarvis {
         campoSenhaCadastro.setText("");
     }
 
+    // Zera o estado temporario dos comandos em etapas.
     private void limparAcaoPendente() {
         acaoPendente = "";
         nomeTemporario = "";
         emailTemporario = "";
     }
 
+    // Mostra mensagens pequenas de erro/aviso ao usuario.
     private void mostrarAviso(String mensagem) {
         JOptionPane.showMessageDialog(janela, mensagem);
     }

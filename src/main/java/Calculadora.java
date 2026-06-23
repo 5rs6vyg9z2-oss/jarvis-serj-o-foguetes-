@@ -1,5 +1,7 @@
+// Classe responsavel por entender e resolver contas simples digitadas pelo usuario.
 public class Calculadora {
 
+    // Verifica se o texto parece ter alguma operacao matematica basica.
     public boolean temOperacao(String texto) {
         return texto.contains("+")
                 || texto.contains("-")
@@ -7,9 +9,11 @@ public class Calculadora {
                 || texto.contains("/");
     }
 
+    // Recebe uma expressao em texto, separa os numeros e devolve uma resposta pronta para a tela.
     public String calcular(String expressao) {
         try {
             if (expressao.contains("+")) {
+                // O "+" precisa de "\\+" porque split usa regex, nao texto puro.
                 String[] partes = expressao.split("\\+");
 
                 if (partes.length == 2) {
@@ -36,6 +40,7 @@ public class Calculadora {
             }
 
             if (expressao.contains("*")) {
+                // O "*" tambem precisa de "\\*" pelo mesmo motivo do "+".
                 String[] partes = expressao.split("\\*");
 
                 if (partes.length == 2) {
@@ -67,6 +72,7 @@ public class Calculadora {
 
             return "nao encontrei uma operacao matematica.";
         } catch (NumberFormatException e) {
+            // NumberFormatException acontece quando o texto nao consegue virar numero.
             return "nao consegui entender os numeros dessa conta.";
         }
     }

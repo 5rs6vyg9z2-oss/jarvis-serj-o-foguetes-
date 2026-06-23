@@ -8,10 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @DisplayName("Usuario Tests")
 public class UsuarioTest {
 
+    // Constantes evitam repetir os mesmos textos em todos os testes.
     private static final String NOME = "Joao Silva";
     private static final String EMAIL = "joao@example.com";
     private static final String SENHA = "senha123";
 
+    // Testa se o construtor realmente guarda os valores recebidos.
     @Test
     @DisplayName("Should create usuario with correct values")
     void testCriacao() {
@@ -56,6 +58,8 @@ public class UsuarioTest {
     @DisplayName("Should serialize usuario to line format")
     void testTransformarEmLinha() {
         Usuario usuario = new Usuario(NOME, EMAIL, SENHA);
+
+        // Serializar aqui significa transformar o objeto em texto.
         String linha = usuario.transformarEmLinha();
 
         String esperado = NOME + ";" + EMAIL + ";" + SENHA;
@@ -66,6 +70,8 @@ public class UsuarioTest {
     @DisplayName("Should deserialize usuario from line format")
     void testCriarPelaLinha() {
         String linha = NOME + ";" + EMAIL + ";" + SENHA;
+
+        // Desserializar faz o caminho inverso: texto vira objeto Usuario.
         Usuario usuario = Usuario.criarPelaLinha(linha);
 
         assertNotNull(usuario);

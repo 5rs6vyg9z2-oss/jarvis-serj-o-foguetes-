@@ -4,14 +4,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for Calculadora class.
- * Tests basic arithmetic operations: addition, subtraction, multiplication, division.
+ * Testes unitarios da Calculadora.
+ * Cada teste verifica um comportamento pequeno e isolado.
  */
 @DisplayName("Calculadora Tests")
 public class CalculadoraTest {
 
+    // Reaproveita a mesma calculadora porque ela nao guarda estado entre chamadas.
     private Calculadora calculadora = new Calculadora();
 
+    // @Test marca o metodo como um teste que o Maven/JUnit deve executar.
     @Test
     @DisplayName("Should detect addition operation in text")
     void testTemOperacaoAddicao() {
@@ -51,6 +53,8 @@ public class CalculadoraTest {
     @DisplayName("Should calculate simple addition")
     void testCalcularAdicao() {
         String resultado = calculadora.calcular("10+5");
+
+        // Assertions sao verificacoes: se falharem, o teste quebra.
         assertNotNull(resultado);
         assertTrue(resultado.contains("15") || resultado.toLowerCase().contains("resultado"));
     }
