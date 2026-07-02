@@ -377,7 +377,7 @@ public class JanelaJarvis {
 
         if (comando.equals("excluir usuario")) {
             acaoPendente = "excluir_nome";
-            return listarUsuariosNaTela() + "\nDigite o nome que deseja excluir:";
+            return "Jarvis: digite o nome do usuario que deseja excluir:\n";
         }
 
         if (comando.equals("alterar email")) {
@@ -454,39 +454,53 @@ public class JanelaJarvis {
             return "usuario excluido com sucesso: " + resposta;
         }
 
+        
         if (acaoPendente.equals("alterar_email_antigo")) {
             if (resposta.isEmpty()) {
                 return "digite o email que deseja alterar:";
             }
-
+            
             emailTemporario = resposta;
             acaoPendente = "alterar_email_novo";
             return "digite o novo email:";
         }
-
+        
         if (acaoPendente.equals("alterar_email_novo")) {
             if (!emailValido(resposta)) {
                 return "digite um email valido:";
             }
-
+            
             if (!emailTemporario.equals(resposta) && gerenciadorUsuarios.emailJaExiste(resposta)) {
                 limparAcaoPendente();
                 return "ja existe um usuario cadastrado com esse email.";
             }
-
+            
             boolean alterado = gerenciadorUsuarios.alterarEmail(emailTemporario, resposta);
             limparAcaoPendente();
-
+            
             if (alterado) {
                 return "email alterado com sucesso: " + emailTemporario + " para " + resposta;
             }
-
+            
             return "usuario nao encontrado com email: " + emailTemporario;
-        }
 
-        limparAcaoPendente();
-        return "nao consegui continuar essa acao.";
-    }
+        }
+        private void  enviarMensagem() {
+            String mensagem = campoMensagem.getText().trim();
+
+            if (mensagem.isEmpty()) {
+                return;
+                
+                areaConversa.append("Voce: " + mensagem + "\n");
+                
+                String resposta = responder(mensagem);
+                
+                areaConversa.append("Jarvis: " + resposta + "\n");
+                campoMensagem.setText("");
+                
+            }
+        }
+           
 
     // Monta um texto amigavel com os usuarios sem mostrar email e senha.
     private String listarUsuariosNaTela() {
@@ -502,6 +516,8 @@ public class JanelaJarvis {
 
         return texto.toString();
     }
+
+    
 
     // Encerra a sessao atual e volta para o login.
     private void sairDaSessao() {

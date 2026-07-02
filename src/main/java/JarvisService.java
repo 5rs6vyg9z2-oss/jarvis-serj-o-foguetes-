@@ -80,6 +80,27 @@ public class JarvisService {
 
         return texto.toString();
     }
+
+    private String excluirUsuario(String mensagem) {
+        String comando = mensagem.trim().toLowerCase();
+        
+        // Extrai o que vem depois de "excluir usuario"
+        String[] partes = comando.split("excluir usuario", 2);
+        
+        if (partes.length < 2 || partes[1].trim().isEmpty()) {
+            return null; // Deixa a GUI tratar o fluxo em etapas
+        }
+        
+        String nomeUsuario = partes[1].trim();
+        
+        boolean excluido = gerenciadorUsuarios.excluirUsuarioPorNome(nomeUsuario);
+        
+        if (excluido) {
+            return "usuario excluido com sucesso: " + nomeUsuario;
+        } else {
+            return "usuario nao encontrado com nome: " + nomeUsuario;
+        }
+    }
 }
 
 
