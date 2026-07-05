@@ -36,35 +36,35 @@ public class JarvisService {
 
     private String alterarNome(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
-        
-        // Extrai o que vem depois de "alterar nome"
+
+        // Extrai o que vem depois de "alterar nome".
         String[] partes = comando.split("alterar nome", 2);
-        
+
         if (partes.length < 2 || partes[1].trim().isEmpty()) {
-            return null; // Deixa a GUI tratar o fluxo em etapas
+            return null;
         }
-        
-        // Se chegar dois nomes separados por "para", processa
+
+        // Se chegar dois nomes separados por "para", processa no service.
         String resto = partes[1].trim();
         if (resto.contains(" para ")) {
             String[] nomes = resto.split(" para ", 2);
             String nomeAntigo = nomes[0].trim();
             String novoNome = nomes[1].trim();
-            
+
             if (nomeAntigo.isEmpty() || novoNome.isEmpty()) {
                 return "nomes nao podem ficar vazios.";
             }
-            
+
             boolean alterado = gerenciadorUsuarios.alterarNome(nomeAntigo, novoNome);
-            
+
             if (alterado) {
                 return "nome alterado com sucesso: " + nomeAntigo + " para " + novoNome;
-            } else {
-                return "usuario nao encontrado com nome: " + nomeAntigo;
             }
+
+            return "usuario nao encontrado com nome: " + nomeAntigo;
         }
-        
-        return null; // Deixa a GUI tratar o fluxo em etapas
+
+        return null;
     }
 
     private String listarUsuarios() {
@@ -83,25 +83,41 @@ public class JarvisService {
 
     private String excluirUsuario(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
-        
-        // Extrai o que vem depois de "excluir usuario"
+
+        // Extrai o que vem depois de "excluir usuario".
         String[] partes = comando.split("excluir usuario", 2);
-        
+
         if (partes.length < 2 || partes[1].trim().isEmpty()) {
-            return null; // Deixa a GUI tratar o fluxo em etapas
+            return null;
         }
-        
+
         String nomeUsuario = partes[1].trim();
-        
         boolean excluido = gerenciadorUsuarios.excluirUsuarioPorNome(nomeUsuario);
-        
+
         if (excluido) {
             return "usuario excluido com sucesso: " + nomeUsuario;
-        } else {
-            return "usuario nao encontrado com nome: " + nomeUsuario;
         }
+
+        return "usuario nao encontrado com nome: " + nomeUsuario;
+    }
+
+    /* Processa o comando recebido e retorna a resposta apropriada.
+    futuramente esse metodo pode ser expandido para processar outros tipos de comandos
+    e sera o cerebro do sistema. em uma classe que ja e o cerebro do codigo */
+    
+    public String processarComando(String mensagem) {
+        String resposta = responder(mensagem);
+
+        if (resposta != null) {
+            return resposta;
+        }
+
+        // Se não for nenhum comando conhecido, tenta excluir usuário.
+        resposta = excluirUsuario(mensagem);
+        if (resposta != null) {
+            return resposta;
+        }
+
+        return "desculpe, nao entendi o comando.";
     }
 }
-
-
-

@@ -386,6 +386,8 @@ public class JanelaJarvis {
         }
 
         return "ainda estou aprendendo a responder isso.";
+
+        
     }
 
     // Controla comandos em etapas, como cadastrar usuario ou alterar email pelo chat.
@@ -485,31 +487,20 @@ public class JanelaJarvis {
             return "usuario nao encontrado com email: " + emailTemporario;
 
         }
-        private void  enviarMensagem() {
-            String mensagem = campoMensagem.getText().trim();
 
-            if (mensagem.isEmpty()) {
-                return;
-                
-                areaConversa.append("Voce: " + mensagem + "\n");
-                
-                String resposta = responder(mensagem);
-                
-                areaConversa.append("Jarvis: " + resposta + "\n");
-                campoMensagem.setText("");
-                
-            }
-        }
-           
+        limparAcaoPendente();
+        return "acao cancelada.";
+    }
 
-    // Monta um texto amigavel com os usuarios sem mostrar email e senha.
-    private String listarUsuariosNaTela() {
+        
+        // Monta um texto amigavel com os usuarios sem mostrar email e senha.
+        private String listarUsuariosNaTela() {
         if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
             return "nenhum usuario cadastrado ainda.";
         }
 
         StringBuilder texto = new StringBuilder("usuarios cadastrados:");
-
+        
         for (Usuario usuario : gerenciadorUsuarios.getUsuarios()) {
             texto.append("\n- ").append(usuario.getNome());
         }
@@ -542,8 +533,8 @@ public class JanelaJarvis {
         JPanel cartao = new JPanel(new GridBagLayout());
         cartao.setBackground(PAINEL);
         cartao.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDA),
-                BorderFactory.createEmptyBorder(28, 28, 28, 28)));
+            BorderFactory.createLineBorder(BORDA),
+            BorderFactory.createEmptyBorder(28, 28, 28, 28)));
         cartao.setPreferredSize(new Dimension(largura, 460));
         return cartao;
     }
@@ -574,7 +565,7 @@ public class JanelaJarvis {
         estilizarCampo(campo);
         return campo;
     }
-
+    
     private void estilizarCampo(JTextField campo) {
         campo.setBackground(CAMPO);
         campo.setForeground(TEXTO);
@@ -584,7 +575,7 @@ public class JanelaJarvis {
                 BorderFactory.createLineBorder(BORDA),
                 BorderFactory.createEmptyBorder(10, 12, 10, 12)));
     }
-
+    
     private JButton criarBotaoPrincipal(String texto) {
         JButton botao = criarBotaoBase(texto);
         botao.setBackground(DESTAQUE);
@@ -660,4 +651,5 @@ public class JanelaJarvis {
     private void mostrarAviso(String mensagem) {
         JOptionPane.showMessageDialog(janela, mensagem);
     }
+    
 }
