@@ -10,7 +10,7 @@ public class GerenciadorUsuarios {
 
     // Usa o banco padrao do projeto.
     public GerenciadorUsuarios() {
-        this("jdbc:postgresql://localhost:5432/jarvis_db?user=jarvis&password=jarvis123");
+        this(new UsuarioRepository());
     }
 
     // Permite escolher outro arquivo de banco, util para teste ou configuracao futura.

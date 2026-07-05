@@ -9,12 +9,24 @@ import java.util.List;
 
 // Repository: camada responsavel por salvar e buscar usuarios no banco PostgreSQL.
 public class UsuarioRepository {
+    public UsuarioRepository() {
+        this(
+            System.getenv("DB_URL"),
+            System.getenv("DB_USER"),
+            System.getenv("DB_PASSWORD")
+        );
+    }
     // URL de conexao com o banco PostgreSQL.
     private String urlBanco;
+    private String usuarioBanco;
+    private String senhaBanco;
 
     // Construtor padrao usado pelo projeto real.
-    public UsuarioRepository() {
-        this("jdbc:postgresql://localhost:5432/jarvis_db?user=jarvis&password=jarvis123");
+    public UsuarioRepository(String urlBanco, String usuarioBanco, String senhaBanco) {
+        this.urlBanco = urlBanco;
+        this.usuarioBanco = usuarioBanco;
+        this.senhaBanco = senhaBanco;
+        criarTabela();
     }
 
     // Construtor com caminho facilita testes ou troca de banco no futuro.
@@ -105,7 +117,7 @@ public class UsuarioRepository {
 
     // Abre uma conexao JDBC com o PostgreSQL configurado.
     private Connection conectar() throws SQLException {
-        return DriverManager.getConnection(urlBanco);
+        return DriverManager.getConnection(urlBanco, usuarioBanco, senhaBanco);
     }
 
     // Garante que a tabela exista antes do gerenciador tentar usar o banco.

@@ -126,7 +126,10 @@ public class JarvisService {
 
         return null;
     }
-
+    /* 
+    Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
+    processarUsuarioComando futuramente. 
+        */ 
     private String processarUsuarioComando(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 
