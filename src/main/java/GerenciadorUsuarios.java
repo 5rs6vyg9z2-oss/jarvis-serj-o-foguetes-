@@ -5,17 +5,17 @@ public class GerenciadorUsuarios {
     // Lista em memoria usada pelo Jarvis enquanto o programa esta aberto.
     private List<Usuario> usuarios;
 
-    // Repository faz a parte de persistencia: gravar e buscar no SQLite.
+    // Repository faz a parte de persistencia: gravar e buscar no PostgreSQL.
     private UsuarioRepository usuarioRepository;
 
     // Usa o banco padrao do projeto.
     public GerenciadorUsuarios() {
-        this("jarvis.db");
+        this("jdbc:postgresql://localhost:5432/jarvis_db?user=jarvis&password=jarvis123");
     }
 
     // Permite escolher outro arquivo de banco, util para teste ou configuracao futura.
-    public GerenciadorUsuarios(String caminhoBanco) {
-        this(new UsuarioRepository(caminhoBanco));
+    public GerenciadorUsuarios(String urlBanco) {
+        this(new UsuarioRepository(urlBanco));
     }
 
     // Recebe um repository pronto e ja carrega os usuarios salvos.

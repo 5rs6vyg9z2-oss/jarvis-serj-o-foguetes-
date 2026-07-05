@@ -38,6 +38,14 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Driver JDBC que permite o Java conversar com o banco PostgreSQL. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.12</version>
+        </dependency>
+
     </dependencies>
 
     <!-- Plugins adicionam comandos extras ao Maven, como executar e testar o projeto. -->

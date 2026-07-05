@@ -7,19 +7,19 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-// Repository: camada responsavel por salvar e buscar usuarios no banco SQLite.
+// Repository: camada responsavel por salvar e buscar usuarios no banco PostgreSQL.
 public class UsuarioRepository {
-    // Caminho do arquivo .db que o SQLite usa para guardar os dados.
-    private String caminhoBanco;
+    // URL de conexao com o banco PostgreSQL.
+    private String urlBanco;
 
     // Construtor padrao usado pelo projeto real.
     public UsuarioRepository() {
-        this("jarvis.db");
+        this("jdbc:postgresql://localhost:5432/jarvis_db?user=jarvis&password=jarvis123");
     }
 
     // Construtor com caminho facilita testes ou troca de banco no futuro.
-    public UsuarioRepository(String caminhoBanco) {
-        this.caminhoBanco = caminhoBanco;
+    public UsuarioRepository(String urlBanco) {
+        this.urlBanco = urlBanco;
         criarTabela();
     }
 
@@ -103,16 +103,16 @@ public class UsuarioRepository {
         return null;
     }
 
-    // Abre uma conexao JDBC com o arquivo SQLite configurado.
+    // Abre uma conexao JDBC com o PostgreSQL configurado.
     private Connection conectar() throws SQLException {
-        return DriverManager.getConnection("jdbc:sqlite:" + caminhoBanco);
+        return DriverManager.getConnection(urlBanco);
     }
 
     // Garante que a tabela exista antes do gerenciador tentar usar o banco.
     private void criarTabela() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS usuarios (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id SERIAL PRIMARY KEY,
                     nome TEXT NOT NULL,
                     email TEXT NOT NULL UNIQUE,
                     senha TEXT NOT NULL
