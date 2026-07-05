@@ -106,18 +106,69 @@ public class JarvisService {
     e sera o cerebro do sistema. em uma classe que ja e o cerebro do codigo */
     
     public String processarComando(String mensagem) {
-        String resposta = responder(mensagem);
+        String resposta = processarDataHoraComando(mensagem);
 
         if (resposta != null) {
             return resposta;
         }
 
-        // Se não for nenhum comando conhecido, tenta excluir usuário.
-        resposta = excluirUsuario(mensagem);
+        resposta = processarCalculadoraComando(mensagem);
+
         if (resposta != null) {
             return resposta;
         }
 
-        return "desculpe, nao entendi o comando.";
+        resposta = processarUsuarioComando(mensagem);
+
+        if (resposta != null) {
+            return resposta;
+        }
+
+        return null;
+    }
+
+    private String processarUsuarioComando(String mensagem) {
+        String comando = mensagem.trim().toLowerCase();
+
+        if (comando.startsWith("alterar nome")) {
+            return alterarNome(mensagem);
+        }
+
+        if (comando.equals("listar usuarios")) {
+            return listarUsuarios();
+        }
+
+        if (comando.startsWith("excluir usuario")) {
+            return excluirUsuario(mensagem);
+        }
+
+        return null;
+    }
+
+    // Processa comandos relacionados a calculadora, como somar, subtrair, multiplicar ou dividir.
+    private String processarCalculadoraComando(String mensagem) {
+        String comando = mensagem.trim().toLowerCase();
+
+        if (calculadora.temOperacao(comando)) {
+            return calculadora.calcular(comando);
+        }
+
+        return null;
+    }
+
+    // Processa comandos relacionados a data e hora, como "que horas sao" ou "qual a data de hoje".
+    private String processarDataHoraComando(String mensagem) {
+        String comando = mensagem.trim().toLowerCase();
+
+        if (comando.contains("hora")) {
+            return "agora sao " + Datahora.obterHorarioAtual();
+        }
+
+        if (comando.contains("data")) {
+            return "hoje e " + Datahora.obterDataAtual();
+        }
+
+        return null;
     }
 }
+

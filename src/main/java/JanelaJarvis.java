@@ -112,6 +112,7 @@ public class JanelaJarvis {
         JLabel subtitulo = criarSubtitulo("Acesse sua conta para iniciar a conversa.");
 
         campoEmailLogin = criarCampoTexto();
+        campoEmailLogin.addActionListener(evento -> campoSenhaLogin.requestFocusInWindow());
         campoSenhaLogin = criarCampoSenha();
         campoSenhaLogin.addActionListener(evento -> entrar());
 
@@ -147,7 +148,9 @@ public class JanelaJarvis {
         JLabel subtitulo = criarSubtitulo("Cadastre nome, email e senha.");
 
         campoNomeCadastro = criarCampoTexto();
+        campoNomeCadastro.addActionListener(evento -> campoEmailCadastro.requestFocusInWindow());
         campoEmailCadastro = criarCampoTexto();
+        campoEmailCadastro.addActionListener(evento -> campoSenhaCadastro.requestFocusInWindow());
         campoSenhaCadastro = criarCampoSenha();
         campoSenhaCadastro.addActionListener(evento -> cadastrar());
 
@@ -360,7 +363,7 @@ public class JanelaJarvis {
             return "ate logo, " + nome + "!";
         }
 
-        String respostaDoServico = jarvisService.responder(mensagem);
+        String respostaDoServico = jarvisService.processarComando(mensagem);
 
         if (respostaDoServico != null) {
             if (usuarioLogado != null) {
