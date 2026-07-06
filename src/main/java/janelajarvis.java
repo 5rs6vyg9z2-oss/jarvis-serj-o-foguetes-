@@ -112,7 +112,8 @@ public class JanelaJarvis {
         JLabel subtitulo = criarSubtitulo("Acesse sua conta para iniciar a conversa.");
 
         campoEmailLogin = criarCampoTexto();
-        campoSenhaLogin = criarCampoSenha();
+        campoEmailLogin.addActionListener(evento -> campoSenhaLogin.requestFocusInWindow());
+        campoSenhaLogin = criarCampoSenha();       
         campoSenhaLogin.addActionListener(evento -> entrar());
 
         JButton botaoEntrar = criarBotaoPrincipal("Entrar");
@@ -147,7 +148,9 @@ public class JanelaJarvis {
         JLabel subtitulo = criarSubtitulo("Cadastre nome, email e senha.");
 
         campoNomeCadastro = criarCampoTexto();
+        campoNomeCadastro.addActionListener(evento -> campoEmailCadastro.requestFocusInWindow());
         campoEmailCadastro = criarCampoTexto();
+        campoEmailCadastro.addActionListener(evento -> campoSenhaCadastro.requestFocusInWindow());
         campoSenhaCadastro = criarCampoSenha();
         campoSenhaCadastro.addActionListener(evento -> cadastrar());
 
