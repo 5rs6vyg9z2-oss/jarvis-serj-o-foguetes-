@@ -113,7 +113,11 @@ public class JanelaJarvis {
 
         campoEmailLogin = criarCampoTexto();
         campoEmailLogin.addActionListener(evento -> campoSenhaLogin.requestFocusInWindow());
+<<<<<<< HEAD:src/main/java/JanelaJarvis.java
         campoSenhaLogin = criarCampoSenha();
+=======
+        campoSenhaLogin = criarCampoSenha();       
+>>>>>>> feature/separar-logica-da-interface:src/main/java/janelajarvis.java
         campoSenhaLogin.addActionListener(evento -> entrar());
 
         JButton botaoEntrar = criarBotaoPrincipal("Entrar");
