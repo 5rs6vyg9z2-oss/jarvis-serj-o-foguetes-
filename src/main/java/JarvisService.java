@@ -15,23 +15,24 @@ public class JarvisService {
             return resposta;
         }
     
-        resposta = processarCalculadoraComando(mensagem);
-    
-        if (resposta != null) {
-            return resposta;
-        }
-    
-        resposta = processarUsuarioComando(mensagem);
-    
-        if (resposta != null) {
-            return resposta;
-        }
-    
-        return null;
-    }
 
     
 // Processa a mensagem recebida e retorna a resposta apropriada, verificando se a mensagem contém comandos relacionados a data, hora, calculadora ou usuários.
+        resposta = processarCalculadoraComando(mensagem);
+
+        if (resposta != null) {
+            return resposta;
+        }
+
+        resposta = processarUsuarioComando(mensagem);
+
+        if (resposta != null) {
+            return resposta;
+        }
+
+        return null;
+    }
+
     public String responder(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 
@@ -128,38 +129,10 @@ public class JarvisService {
     /* Processa o comando recebido e retorna a resposta apropriada.
     futuramente esse metodo pode ser expandido para processar outros tipos de comandos
     e sera o cerebro do sistema. em uma classe que ja e o cerebro do codigo */
-<<<<<<< HEAD
-    
-    public String processarComando(String mensagem) {
-        String resposta = processarDataHoraComando(mensagem);
-=======
     /* 
     Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
     processarUsuarioComando futuramente. 
         */ 
-    private String processarUsuarioComando(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
->>>>>>> feature/separar-logica-da-interface
-
-        if (comando.startsWith("alterar nome")) {
-            return alterarNome(mensagem);
-        }
-
-<<<<<<< HEAD
-        resposta = processarCalculadoraComando(mensagem);
-
-        if (resposta != null) {
-            return resposta;
-        }
-
-        resposta = processarUsuarioComando(mensagem);
-
-        if (resposta != null) {
-            return resposta;
-        }
-
-        return null;
-    }
     /* 
     Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
     processarUsuarioComando futuramente. 
@@ -175,12 +148,6 @@ public class JarvisService {
             return listarUsuarios();
         }
 
-=======
-        if (comando.equals("listar usuarios")) {
-            return listarUsuarios();
-        }
-
->>>>>>> feature/separar-logica-da-interface
         if (comando.startsWith("excluir usuario")) {
             return excluirUsuario(mensagem);
         }
