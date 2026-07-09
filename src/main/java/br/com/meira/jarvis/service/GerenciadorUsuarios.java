@@ -1,3 +1,7 @@
+package br.com.meira.jarvis.service;
+
+import br.com.meira.jarvis.model.Usuario;
+import br.com.meira.jarvis.repository.UsuarioRepository;
 import java.util.List;
 
 // Centraliza as regras de usuario entre a tela/terminal e o banco de dados.

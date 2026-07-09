@@ -1,4 +1,5 @@
 package br.com.meira.jarvis.repository;
+
 import br.com.meira.jarvis.model.Usuario;
 import java.sql.Connection;
 import java.sql.DriverManager;

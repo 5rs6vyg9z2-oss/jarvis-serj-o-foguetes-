@@ -1,3 +1,9 @@
+package br.com.meira.jarvis.service;
+
+import br.com.meira.jarvis.model.Usuario;
+import br.com.meira.jarvis.util.Calculadora;
+import br.com.meira.jarvis.util.Datahora;
+
 // Camada de servico: decide respostas simples sem depender da interface grafica.
 public class JarvisService {
     private GerenciadorUsuarios gerenciadorUsuarios;
@@ -32,7 +38,7 @@ public class JarvisService {
 
         return null;
     }
-// Responde a mensagem recebida, verificando se contém comandos relacionados a data, hora, calculadora ou usuários.
+
     public String responder(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 
@@ -91,7 +97,7 @@ public class JarvisService {
 
         return null;
     }
-// Lista os usuários cadastrados, retornando uma mensagem apropriada caso não haja usuários cadastrados.
+
     private String listarUsuarios() {
         if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
             return "nenhum usuario cadastrado ainda.";
@@ -105,7 +111,7 @@ public class JarvisService {
 
         return texto.toString();
     }
-/* Exclui um usuário pelo nome, retornando uma mensagem apropriada caso o usuário não seja encontrado. */
+/* a excluir usuario alem de ser auto explicativo, futuramente pode ser movida para o processarUsuarioComando */
     private String excluirUsuario(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 
@@ -126,7 +132,17 @@ public class JarvisService {
         return "usuario nao encontrado com nome: " + nomeUsuario;
     }
 
-    /*processa comandos relacionados a usuarios, como alterar nome, listar usuarios e excluir usuarios' */
+    /* Processa o comando recebido e retorna a resposta apropriada.
+    futuramente esse metodo pode ser expandido para processar outros tipos de comandos
+    e sera o cerebro do sistema. em uma classe que ja e o cerebro do codigo */
+    /* 
+    Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
+    processarUsuarioComando futuramente. 
+        */ 
+    /* 
+    Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
+    processarUsuarioComando futuramente. 
+        */ 
     private String processarUsuarioComando(String mensagem) {
         String comando = mensagem.trim().toLowerCase();
 

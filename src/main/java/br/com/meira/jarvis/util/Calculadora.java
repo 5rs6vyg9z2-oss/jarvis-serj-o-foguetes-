@@ -1,3 +1,5 @@
+package br.com.meira.jarvis.util;
+
 // Classe responsavel por entender e resolver contas simples digitadas pelo usuario.
 public class Calculadora {
 

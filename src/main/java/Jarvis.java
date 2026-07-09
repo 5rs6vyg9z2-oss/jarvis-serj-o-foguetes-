@@ -1,3 +1,7 @@
+import br.com.meira.jarvis.model.Usuario;
+import br.com.meira.jarvis.service.GerenciadorUsuarios;
+import br.com.meira.jarvis.util.Calculadora;
+import br.com.meira.jarvis.util.Datahora;
 import java.util.Scanner;
 
 // Porta de entrada do projeto: hoje abre a janela, mas ainda guarda o modo terminal.
