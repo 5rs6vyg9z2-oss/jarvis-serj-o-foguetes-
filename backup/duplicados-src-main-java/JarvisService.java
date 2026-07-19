@@ -1,4 +1,6 @@
+    
 // Camada de servico: decide respostas simples sem depender da interface grafica.
+@service
 public class JarvisService {
     private GerenciadorUsuarios gerenciadorUsuarios;
     private Calculadora calculadora;

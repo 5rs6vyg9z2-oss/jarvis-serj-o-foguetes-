@@ -3,151 +3,66 @@ package br.com.meira.jarvis.service;
 import br.com.meira.jarvis.model.Usuario;
 import br.com.meira.jarvis.util.Calculadora;
 import br.com.meira.jarvis.util.Datahora;
+import org.springframework.stereotype.Service;
 
-// Camada de servico: decide respostas simples sem depender da interface grafica.
+// Centraliza a interpretacao dos textos recebidos pela interface.
+@Service
 public class JarvisService {
-    private GerenciadorUsuarios gerenciadorUsuarios;
-    private Calculadora calculadora;
+    private final GerenciadorUsuarios gerenciadorUsuarios;
+    private final Calculadora calculadora;
 
     public JarvisService(GerenciadorUsuarios gerenciadorUsuarios) {
         this.gerenciadorUsuarios = gerenciadorUsuarios;
         this.calculadora = new Calculadora();
     }
 
-    public String processarComando(String mensagem) {
-        String resposta = processarDataHoraComando(mensagem);
-    
-        if (resposta != null) {
-            return resposta;
-        }
-    
+    // Identifica a area do comando e encaminha para a classe ou metodo responsavel.
+    public String processarComando(String texto) {
+        String intencao = identificarIntencao(texto);
 
-    
-// Processa a mensagem recebida e retorna a resposta apropriada, verificando se a mensagem contém comandos relacionados a data, hora, calculadora ou usuários.
-        resposta = processarCalculadoraComando(mensagem);
-
-        if (resposta != null) {
-            return resposta;
+        if (intencao == null) {
+            return respostaDesconhecida();
         }
 
-        resposta = processarUsuarioComando(mensagem);
+        switch (intencao) {
+            case "hora":
+            case "data":
+                return processarDataHoraComando(texto);
 
-        if (resposta != null) {
-            return resposta;
+            case "calculadora":
+                return processarCalculadoraComando(texto);
+
+            case "excluir usuario":
+            case "alterar usuario":
+            case "adicionar usuario":
+            case "listar usuarios":
+            case "alterar senha":
+                String respostaUsuario = processarComandos(texto);
+                return respostaUsuario != null
+                        ? respostaUsuario
+                        : "comando de usuario incompleto. Tente informar todos os dados pedidos.";
+
+            default:
+                return respostaDesconhecida();
         }
-
-        return null;
     }
 
-    public String responder(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
+    // Mantem o nome antigo para telas ou codigos que ainda chamam responder.
+    public String responder(String texto) {
+        return processarComando(texto);
+    }
 
-        if (comando.contains("hora")) {
-            return "agora sao " + Datahora.obterHorarioAtual();
-        }
+    // Aceita sinonimos, mas produz uma frase padrao que os metodos abaixo entendem.
+    private String processarComandos(String texto) {
+        return processarUsuarioComando(normalizarComandoUsuario(texto));
+    }
 
-        if (comando.contains("data")) {
-            return "hoje e " + Datahora.obterDataAtual();
-        }
-
-        if (calculadora.temOperacao(comando)) {
-            return calculadora.calcular(comando);
-        }
-
-        if (comando.equals("listar usuarios")) {
-            return listarUsuarios();
-        }
+    // Encaminha somente comandos de usuario ja colocados no formato padrao.
+    private String processarUsuarioComando(String texto) {
+        String comando = texto.trim().toLowerCase();
 
         if (comando.startsWith("alterar nome")) {
-            return alterarNome(mensagem);
-        }
-
-        return null;
-    }
-// Processa o comando de alterar nome, verificando se o formato da mensagem está correto e chamando o gerenciador de usuários para realizar a alteração.
-    private String alterarNome(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
-
-        // Extrai o que vem depois de "alterar nome".
-        String[] partes = comando.split("alterar nome", 2);
-
-        if (partes.length < 2 || partes[1].trim().isEmpty()) {
-            return null;
-        }
-
-        // Se chegar dois nomes separados por "para", processa no service.
-        String resto = partes[1].trim();
-        if (resto.contains(" para ")) {
-            String[] nomes = resto.split(" para ", 2);
-            String nomeAntigo = nomes[0].trim();
-            String novoNome = nomes[1].trim();
-
-            if (nomeAntigo.isEmpty() || novoNome.isEmpty()) {
-                return "nomes nao podem ficar vazios.";
-            }
-
-            boolean alterado = gerenciadorUsuarios.alterarNome(nomeAntigo, novoNome);
-
-            if (alterado) {
-                return "nome alterado com sucesso: " + nomeAntigo + " para " + novoNome;
-            }
-
-            return "usuario nao encontrado com nome: " + nomeAntigo;
-        }
-
-        return null;
-    }
-
-    private String listarUsuarios() {
-        if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
-            return "nenhum usuario cadastrado ainda.";
-        }
-
-        StringBuilder texto = new StringBuilder("usuarios cadastrados:");
-
-        for (Usuario usuario : gerenciadorUsuarios.getUsuarios()) {
-            texto.append("\n- ").append(usuario.getNome());
-        }
-
-        return texto.toString();
-    }
-/* a excluir usuario alem de ser auto explicativo, futuramente pode ser movida para o processarUsuarioComando */
-    private String excluirUsuario(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
-
-        // Extrai o que vem depois de "excluir usuario".
-        String[] partes = comando.split("excluir usuario", 2);
-
-        if (partes.length < 2 || partes[1].trim().isEmpty()) {
-            return null;
-        }
-
-        String nomeUsuario = partes[1].trim();
-        boolean excluido = gerenciadorUsuarios.excluirUsuarioPorNome(nomeUsuario);
-
-        if (excluido) {
-            return "usuario excluido com sucesso: " + nomeUsuario;
-        }
-
-        return "usuario nao encontrado com nome: " + nomeUsuario;
-    }
-
-    /* Processa o comando recebido e retorna a resposta apropriada.
-    futuramente esse metodo pode ser expandido para processar outros tipos de comandos
-    e sera o cerebro do sistema. em uma classe que ja e o cerebro do codigo */
-    /* 
-    Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
-    processarUsuarioComando futuramente. 
-        */ 
-    /* 
-    Processa comandos relacionados a usuários, como alterar nome, listar. o excluir e funçao direta do processarComando, mas pode ser movida para o
-    processarUsuarioComando futuramente. 
-        */ 
-    private String processarUsuarioComando(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
-
-        if (comando.startsWith("alterar nome")) {
-            return alterarNome(mensagem);
+            return alterarNome(texto);
         }
 
         if (comando.equals("listar usuarios")) {
@@ -155,36 +70,290 @@ public class JarvisService {
         }
 
         if (comando.startsWith("excluir usuario")) {
-            return excluirUsuario(mensagem);
+            return excluirUsuario(texto);
+        }
+
+        if (comando.startsWith("alterar email")) {
+            return alterarEmail(texto);
+        }
+
+        if (comando.startsWith("adicionar usuario")) {
+            return adicionarUsuario(texto);
+        }
+
+        if (comando.startsWith("alterar senha")) {
+            return orientarAlteracaoSenha();
         }
 
         return null;
     }
 
-    // Processa comandos relacionados a calculadora, como somar, subtrair, multiplicar ou dividir.
-    private String processarCalculadoraComando(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
+    // Converte apenas o inicio do comando; os dados informados pelo usuario sao preservados.
+    private String normalizarComandoUsuario(String texto) {
+        String original = texto.trim();
+        String comparacao = original.toLowerCase();
 
-        if (calculadora.temOperacao(comando)) {
-            return calculadora.calcular(comando);
+        if (comparacao.startsWith("salvar usuario ")) {
+            return "adicionar usuario " + original.substring("salvar usuario ".length()).trim();
         }
 
-        return null;
+        if (comparacao.startsWith("cadastrar usuario ")) {
+            return "adicionar usuario " + original.substring("cadastrar usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("criar usuario ")) {
+            return "adicionar usuario " + original.substring("criar usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("inserir usuario ")) {
+            return "adicionar usuario " + original.substring("inserir usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("remover usuario ")) {
+            return "excluir usuario " + original.substring("remover usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("apagar usuario ")) {
+            return "excluir usuario " + original.substring("apagar usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("deletar usuario ")) {
+            return "excluir usuario " + original.substring("deletar usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("delete usuario ")) {
+            return "excluir usuario " + original.substring("delete usuario ".length()).trim();
+        }
+
+        if (comparacao.startsWith("mudar nome ")) {
+            return "alterar nome " + original.substring("mudar nome ".length()).trim();
+        }
+
+        if (comparacao.startsWith("modificar nome ")) {
+            return "alterar nome " + original.substring("modificar nome ".length()).trim();
+        }
+
+        if (comparacao.startsWith("mudar email ")) {
+            return "alterar email " + original.substring("mudar email ".length()).trim();
+        }
+
+        if (comparacao.startsWith("modificar email ")) {
+            return "alterar email " + original.substring("modificar email ".length()).trim();
+        }
+
+        if (comparacao.equals("mostrar usuarios") || comparacao.equals("mostrar usuario")
+                || comparacao.equals("ver usuarios") || comparacao.equals("ver usuario")
+                || comparacao.equals("listar usuario")) {
+            return "listar usuarios";
+        }
+
+        if (comparacao.startsWith("alterar a senha") || comparacao.startsWith("mudar senha")
+                || comparacao.startsWith("mudar a senha") || comparacao.startsWith("trocar senha")
+                || comparacao.startsWith("trocar a senha") || comparacao.startsWith("modificar senha")
+                || comparacao.startsWith("modificar a senha")) {
+            return "alterar senha";
+        }
+
+        return original;
     }
 
-    // Processa comandos relacionados a data e hora, como "que horas sao" ou "qual a data de hoje".
-    private String processarDataHoraComando(String mensagem) {
-        String comando = mensagem.trim().toLowerCase();
+    // Formato: alterar nome nome antigo para nome novo.
+    private String alterarNome(String texto) {
+        String resto = extrairRestoDoComando(texto, "alterar nome");
 
-        if (comando.contains("hora")) {
+        if (resto == null) {
+            return "informe o nome antigo e o novo: alterar nome Carlos para Joao.";
+        }
+
+        String[] nomes = separarPorPara(resto);
+        if (nomes == null) {
+            return "informe o nome antigo e o novo: alterar nome Carlos para Joao.";
+        }
+
+        boolean alterado = gerenciadorUsuarios.alterarNome(nomes[0], nomes[1]);
+        if (alterado) {
+            return "nome alterado com sucesso: " + nomes[0] + " para " + nomes[1];
+        }
+
+        return "usuario nao encontrado com nome: " + nomes[0];
+    }
+
+    private String listarUsuarios() {
+        if (gerenciadorUsuarios.getUsuarios().isEmpty()) {
+            return "nenhum usuario cadastrado ainda.";
+        }
+
+        StringBuilder resposta = new StringBuilder("usuarios cadastrados:");
+        for (Usuario usuario : gerenciadorUsuarios.getUsuarios()) {
+            resposta.append("\n- ").append(usuario.getNome());
+        }
+
+        return resposta.toString();
+    }
+
+    // Formato: excluir usuario nome do usuario.
+    private String excluirUsuario(String texto) {
+        String nomeUsuario = extrairRestoDoComando(texto, "excluir usuario");
+
+        if (nomeUsuario == null) {
+            return "informe o nome: excluir usuario Carlos.";
+        }
+
+        boolean excluido = gerenciadorUsuarios.excluirUsuarioPorNome(nomeUsuario);
+        if (excluido) {
+            return "usuario excluido com sucesso: " + nomeUsuario;
+        }
+
+        return "usuario nao encontrado com nome: " + nomeUsuario;
+    }
+
+    // Formato: alterar email email-antigo para email-novo.
+    private String alterarEmail(String texto) {
+        String resto = extrairRestoDoComando(texto, "alterar email");
+
+        if (resto == null) {
+            return "informe os dois emails: alterar email antigo@exemplo.com para novo@exemplo.com.";
+        }
+
+        String[] emails = separarPorPara(resto);
+        if (emails == null) {
+            return "informe os dois emails: alterar email antigo@exemplo.com para novo@exemplo.com.";
+        }
+
+        boolean alterado = gerenciadorUsuarios.alterarEmail(emails[0], emails[1]);
+        if (alterado) {
+            return "email alterado com sucesso: " + emails[0] + " para " + emails[1];
+        }
+
+        return "nao foi possivel alterar o email. Confira o email antigo e se o novo ja nao esta em uso.";
+    }
+
+    // Formato: adicionar usuario nome com email email@exemplo.com.
+    private String adicionarUsuario(String texto) {
+        String resto = extrairRestoDoComando(texto, "adicionar usuario");
+        if (resto == null) {
+            return "informe o usuario no formato: adicionar usuario Nome com email email@exemplo.com.";
+        }
+
+        String marcador = " com email ";
+        int indiceEmail = resto.toLowerCase().indexOf(marcador);
+        if (indiceEmail < 1 || indiceEmail + marcador.length() >= resto.length()) {
+            return "informe o usuario no formato: adicionar usuario Nome com email email@exemplo.com.";
+        }
+
+        String nome = resto.substring(0, indiceEmail).trim();
+        String email = resto.substring(indiceEmail + marcador.length()).trim();
+        boolean adicionado = gerenciadorUsuarios.adicionarUsuario(new Usuario(nome, email, "senhaPadrao"));
+
+        if (adicionado) {
+            return "usuario adicionado com sucesso: " + nome;
+        }
+
+        return "nao foi possivel adicionar usuario. Confira se os dados estao preenchidos e se o email ja nao existe.";
+    }
+
+    // Senhas nao devem ser enviadas pela conversa, pois a rota de mensagem usa GET.
+    private String orientarAlteracaoSenha() {
+        return "para alterar sua senha, use a acao segura de configuracoes da conta.";
+    }
+
+    private String processarCalculadoraComando(String texto) {
+        if (calculadora.temOperacao(texto)) {
+            return calculadora.calcular(texto);
+        }
+
+        return "digite uma conta com dois numeros, por exemplo: 10 mais 5.";
+    }
+
+    private String processarDataHoraComando(String texto) {
+        String comando = texto.trim().toLowerCase();
+
+        if (comando.contains("hora") || comando.contains("horario") || comando.contains("time")) {
             return "agora sao " + Datahora.obterHorarioAtual();
         }
 
-        if (comando.contains("data")) {
-            return "hoje e " + Datahora.obterDataAtual();
+        return "hoje e " + Datahora.obterDataAtual();
+    }
+
+    private String identificarIntencao(String mensagem) {
+        if (mensagem == null || mensagem.isBlank()) {
+            return null;
+        }
+
+        String texto = mensagem.trim().toLowerCase();
+
+        if (texto.contains("senha") && (texto.contains("alterar") || texto.contains("mudar")
+                || texto.contains("trocar") || texto.contains("modificar"))) {
+            return "alterar senha";
+        }
+
+        if ((texto.contains("apagar") || texto.contains("excluir") || texto.contains("deletar")
+                || texto.contains("delete") || texto.contains("remover")) && texto.contains("usuario")) {
+            return "excluir usuario";
+        }
+
+        if ((texto.contains("alterar") || texto.contains("mudar") || texto.contains("modificar")
+                || texto.contains("update")) && (texto.contains("nome") || texto.contains("email"))) {
+            return "alterar usuario";
+        }
+
+        if ((texto.contains("adicionar") || texto.contains("salvar") || texto.contains("cadastrar")
+                || texto.contains("inserir") || texto.contains("criar") || texto.contains("create"))
+                && texto.contains("usuario")) {
+            return "adicionar usuario";
+        }
+
+        if ((texto.contains("listar") || texto.contains("ver") || texto.contains("mostrar")
+                || texto.contains("list")) && texto.contains("usuario")) {
+            return "listar usuarios";
+        }
+
+        if (texto.contains("hora") || texto.contains("horario") || texto.contains("time")) {
+            return "hora";
+        }
+
+        if (texto.contains("data") || texto.contains("dia") || texto.contains("calendario")
+                || texto.contains("today") || texto.contains("date")) {
+            return "data";
+        }
+
+        if (calculadora.temOperacao(texto) || texto.contains("calcular") || texto.contains("resolver")
+                || texto.contains("operacao") || texto.contains("quanto e") || texto.contains("resultado")) {
+            return "calculadora";
         }
 
         return null;
     }
-}
 
+    private String extrairRestoDoComando(String texto, String inicio) {
+        String original = texto.trim();
+        if (!original.toLowerCase().startsWith(inicio)) {
+            return null;
+        }
+
+        String resto = original.substring(inicio.length()).trim();
+        return resto.isEmpty() ? null : resto;
+    }
+
+    private String[] separarPorPara(String texto) {
+        String marcador = " para ";
+        int indice = texto.toLowerCase().indexOf(marcador);
+
+        if (indice < 1 || indice + marcador.length() >= texto.length()) {
+            return null;
+        }
+
+        String primeiroValor = texto.substring(0, indice).trim();
+        String segundoValor = texto.substring(indice + marcador.length()).trim();
+
+        if (primeiroValor.isEmpty() || segundoValor.isEmpty()) {
+            return null;
+        }
+
+        return new String[] {primeiroValor, segundoValor};
+    }
+
+    private String respostaDesconhecida() {
+        return "desculpa, ainda nao sei como responder a isso. Tente outro comando ou pergunte sobre hora, data, calculadora ou usuarios.";
+    }
+}

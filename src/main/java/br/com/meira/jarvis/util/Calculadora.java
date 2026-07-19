@@ -1,18 +1,21 @@
 package br.com.meira.jarvis.util;
-
+import org.springframework.stereotype.Service;
 // Classe responsavel por entender e resolver contas simples digitadas pelo usuario.
+@Service
 public class Calculadora {
 
     // Verifica se o texto parece ter alguma operacao matematica basica.
     public boolean temOperacao(String texto) {
-        return texto.contains("+")
-                || texto.contains("-")
-                || texto.contains("*")
-                || texto.contains("/");
+        String expressaoNormalizada = normalizarExpressao(texto);
+        return expressaoNormalizada.contains("+")
+                || expressaoNormalizada.contains("-")
+                || expressaoNormalizada.contains("*")
+                || expressaoNormalizada.contains("/");
     }
 
     // Recebe uma expressao em texto, separa os numeros e devolve uma resposta pronta para a tela.
     public String calcular(String expressao) {
+        expressao = normalizarExpressao(expressao);
         try {
             if (expressao.contains("+")) {
                 // O "+" precisa de "\\+" porque split usa regex, nao texto puro.
@@ -77,5 +80,23 @@ public class Calculadora {
             // NumberFormatException acontece quando o texto nao consegue virar numero.
             return "nao consegui entender os numeros dessa conta.";
         }
+    }
+    private String normalizarExpressao(String expressao) {
+       String texto = expressao.trim().toLowerCase();
+       return texto
+               .replace("x", "*")
+               .replace("vezes", "*")
+               .replace("multiplicar", "*")
+               .replace("multiplicado por", "*")
+               .replace("dividido por", "/")
+               .replace("dividido", "/")
+               .replace("dividir por", "/")
+               .replace("dividir", "/")
+               .replace("adicionar", "+")
+               .replace("somar", "+")
+               .replace("mais", "+")
+               .replace("subtrair", "-")
+               .replace("menos", "-");
+
     }
 }

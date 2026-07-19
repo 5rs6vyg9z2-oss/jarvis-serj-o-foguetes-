@@ -1,6 +1,9 @@
 package br.com.meira.jarvis.repository;
 
 import br.com.meira.jarvis.model.Usuario;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,9 +17,9 @@ import java.util.List;
 public class UsuarioRepository {
     public UsuarioRepository() {
         this(
-            System.getenv("DB_URL"),
-            System.getenv("DB_USER"),
-            System.getenv("DB_PASSWORD")
+            obterConfiguracao("DB_URL"),
+            obterConfiguracao("DB_USER"),
+            obterConfiguracao("DB_PASSWORD")
         );
     }
     // URL de conexao com o banco PostgreSQL.
@@ -55,7 +58,7 @@ public class UsuarioRepository {
                 usuarios.add(new Usuario(nome, email, senha));
             }
         } catch (SQLException e) {
-            System.out.println("erro ao listar usuarios no banco.");
+            System.out.println("erro ao listar usuarios no banco: " + e.getMessage());
         }
 
         return usuarios;
@@ -86,10 +89,10 @@ public class UsuarioRepository {
                 conexao.commit();
             } catch (SQLException e) {
                 conexao.rollback();
-                System.out.println("erro ao salvar usuarios no banco.");
+                System.out.println("erro ao salvar usuarios no banco: " + e.getMessage());
             }
         } catch (SQLException e) {
-            System.out.println("erro ao conectar no banco.");
+            System.out.println("erro ao conectar no banco: " + e.getMessage());
         }
     }
 
@@ -112,7 +115,7 @@ public class UsuarioRepository {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("erro ao buscar usuario no banco.");
+            System.out.println("erro ao buscar usuario no banco: " + e.getMessage());
         }
 
         return null;
@@ -120,6 +123,10 @@ public class UsuarioRepository {
 
     // Abre uma conexao JDBC com o PostgreSQL configurado.
     private Connection conectar() throws SQLException {
+        if (textoVazio(urlBanco) || textoVazio(usuarioBanco) || textoVazio(senhaBanco)) {
+            throw new SQLException("configuracao do banco incompleta. Confira DB_URL, DB_USER e DB_PASSWORD.");
+        }
+
         return DriverManager.getConnection(urlBanco, usuarioBanco, senhaBanco);
     }
 
@@ -138,7 +145,54 @@ public class UsuarioRepository {
                 Statement comando = conexao.createStatement()) {
             comando.execute(sql);
         } catch (SQLException e) {
-            System.out.println("erro ao criar tabela de usuarios.");
+            System.out.println("erro ao criar tabela de usuarios: " + e.getMessage());
         }
+    }
+
+    // Busca primeiro nas variaveis do sistema; se nao achar, le o arquivo .env.
+    private static String obterConfiguracao(String nome) {
+        String valor = System.getenv(nome);
+
+        if (!textoVazio(valor)) {
+            return valor;
+        }
+
+        return lerConfiguracaoDoEnv(nome);
+    }
+
+    private static String lerConfiguracaoDoEnv(String nome) {
+        Path diretorio = Path.of(System.getProperty("user.dir")).toAbsolutePath();
+
+        while (diretorio != null) {
+            Path arquivoEnv = diretorio.resolve(".env");
+
+            if (Files.exists(arquivoEnv)) {
+                try {
+                    for (String linha : Files.readAllLines(arquivoEnv)) {
+                        String linhaLimpa = linha.trim();
+
+                        if (linhaLimpa.isEmpty() || linhaLimpa.startsWith("#")) {
+                            continue;
+                        }
+
+                        String[] partes = linhaLimpa.split("=", 2);
+
+                        if (partes.length == 2 && partes[0].trim().equals(nome)) {
+                            return partes[1].trim();
+                        }
+                    }
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+
+            diretorio = diretorio.getParent();
+        }
+
+        return null;
+    }
+
+    private static boolean textoVazio(String texto) {
+        return texto == null || texto.trim().isEmpty();
     }
 }

@@ -3,9 +3,9 @@ services:
     image: postgres:16
     container_name: jarvis_postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: jarvis_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -13,4 +13,4 @@ services:
 
 volumes:
   jarvis_postgres_data:
-
+    name: jarvis_postgres_data_v2
