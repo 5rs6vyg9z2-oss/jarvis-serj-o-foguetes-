@@ -7,8 +7,6 @@ import java.util.Scanner;
 // Porta de entrada do projeto: hoje abre a janela, mas ainda guarda o modo terminal.
 public class Jarvis {
 
-    private static final String CAMINHO_BANCO = "jarvis.db";
-
     // O main oficial chama a interface grafica.
     public static void main(String[] args) {
         JanelaJarvis.main(args);
@@ -17,7 +15,7 @@ public class Jarvis {
     // Mantido para estudo e comparacao com a versao antiga via terminal.
     public static void iniciarPeloTerminal(String[] args) {
         Scanner entrada = new Scanner(System.in);
-        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios(CAMINHO_BANCO);
+        GerenciadorUsuarios gerenciadorUsuarios = new GerenciadorUsuarios();
         Calculadora calculadora = new Calculadora();
 
         System.out.println("ola, sou o serjao foguetes");

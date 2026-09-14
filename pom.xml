@@ -18,19 +18,13 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <exec.mainClass>JanelaJarvis</exec.mainClass>
+        <maven.compiler.release>21</maven.compiler.release>
+        <exec.mainClass>br.com.meira.jarvis.JarvisApiApplication</exec.mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <!-- Dependencias sao bibliotecas externas que o projeto usa. -->
     <dependencies>
-        <!-- Driver JDBC que permite o Java conversar com o banco SQLite. -->
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.53.2.0</version>
-        </dependency>
-
         <!-- JUnit e a biblioteca usada pelos testes em src/test/java. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

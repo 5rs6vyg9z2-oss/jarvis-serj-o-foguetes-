@@ -2,6 +2,7 @@ package br.com.meira.jarvis.repository;
 
 import br.com.meira.jarvis.model.Usuario;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -11,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 // Repository: camada responsavel por salvar e buscar usuarios no banco PostgreSQL.
 public class UsuarioRepository {
@@ -35,10 +38,13 @@ public class UsuarioRepository {
         criarTabela();
     }
 
-    // Construtor com caminho facilita testes ou troca de banco no futuro.
+    // Construtor com URL JDBC facilita testes ou troca de banco no futuro.
     public UsuarioRepository(String urlBanco) {
-        this.urlBanco = urlBanco;
-        criarTabela();
+        this(
+            urlBanco,
+            obterConfiguracao("DB_USER"),
+            obterConfiguracao("DB_PASSWORD")
+        );
     }
 
     // Le todos os usuarios do banco e coloca em uma lista na memoria.
@@ -58,7 +64,7 @@ public class UsuarioRepository {
                 usuarios.add(new Usuario(nome, email, senha));
             }
         } catch (SQLException e) {
-            System.out.println("erro ao listar usuarios no banco: " + e.getMessage());
+            throw erroBanco("listar usuarios", e);
         }
 
         return usuarios;
@@ -88,11 +94,16 @@ public class UsuarioRepository {
                 inserir.executeBatch();
                 conexao.commit();
             } catch (SQLException e) {
-                conexao.rollback();
-                System.out.println("erro ao salvar usuarios no banco: " + e.getMessage());
+                try {
+                    conexao.rollback();
+                } catch (SQLException erroRollback) {
+                    e.addSuppressed(erroRollback);
+                }
+
+                throw erroBanco("salvar usuarios", e);
             }
         } catch (SQLException e) {
-            System.out.println("erro ao conectar no banco: " + e.getMessage());
+            throw erroBanco("conectar ao banco", e);
         }
     }
 
@@ -115,7 +126,7 @@ public class UsuarioRepository {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("erro ao buscar usuario no banco: " + e.getMessage());
+            throw erroBanco("buscar usuario", e);
         }
 
         return null;
@@ -145,7 +156,7 @@ public class UsuarioRepository {
                 Statement comando = conexao.createStatement()) {
             comando.execute(sql);
         } catch (SQLException e) {
-            System.out.println("erro ao criar tabela de usuarios: " + e.getMessage());
+            throw erroBanco("criar a tabela de usuarios", e);
         }
     }
 
@@ -161,9 +172,7 @@ public class UsuarioRepository {
     }
 
     private static String lerConfiguracaoDoEnv(String nome) {
-        Path diretorio = Path.of(System.getProperty("user.dir")).toAbsolutePath();
-
-        while (diretorio != null) {
+        for (Path diretorio : diretoriosParaBuscarEnv()) {
             Path arquivoEnv = diretorio.resolve(".env");
 
             if (Files.exists(arquivoEnv)) {
@@ -186,10 +195,49 @@ public class UsuarioRepository {
                 }
             }
 
-            diretorio = diretorio.getParent();
         }
 
         return null;
+    }
+
+    // Procura pelo .env tanto pela pasta de execucao quanto pela pasta do projeto compilado.
+    private static Set<Path> diretoriosParaBuscarEnv() {
+        Set<Path> diretorios = new LinkedHashSet<>();
+        adicionarDiretorioEAncestrais(
+            diretorios,
+            Path.of(System.getProperty("user.dir")).toAbsolutePath()
+        );
+
+        try {
+            Path origem = Path.of(
+                UsuarioRepository.class.getProtectionDomain().getCodeSource().getLocation().toURI()
+            );
+
+            if (Files.isRegularFile(origem)) {
+                origem = origem.getParent();
+            }
+
+            adicionarDiretorioEAncestrais(diretorios, origem);
+        } catch (URISyntaxException | NullPointerException e) {
+            // A busca pela pasta de execucao ainda funciona quando a origem nao esta disponivel.
+        }
+
+        return diretorios;
+    }
+
+    private static void adicionarDiretorioEAncestrais(Set<Path> diretorios, Path diretorio) {
+        while (diretorio != null) {
+            diretorios.add(diretorio);
+            diretorio = diretorio.getParent();
+        }
+    }
+
+    private static IllegalStateException erroBanco(String operacao, SQLException causa) {
+        return new IllegalStateException(
+            "Nao foi possivel " + operacao
+                + ". Confira se o Docker/PostgreSQL esta ativo e se DB_URL, DB_USER e DB_PASSWORD estao corretos.",
+            causa
+        );
     }
 
     private static boolean textoVazio(String texto) {

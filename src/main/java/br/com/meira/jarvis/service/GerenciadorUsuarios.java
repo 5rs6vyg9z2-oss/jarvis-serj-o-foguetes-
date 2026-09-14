@@ -20,7 +20,7 @@ public class GerenciadorUsuarios {
         this(new UsuarioRepository());
     }
 
-    // Permite escolher outro arquivo de banco, util para teste ou configuracao futura.
+    // Permite escolher outra URL JDBC, util para teste ou configuracao futura.
     public GerenciadorUsuarios(String urlBanco) {
         this(new UsuarioRepository(urlBanco));
     }
