@@ -36,14 +36,7 @@ formularioLogin.addEventListener('submit', function(event) {
         body: JSON.stringify({ email: email, senha: senha })
     })
     .then(response => response.text())
-    .then(resultado => {
-        if (resultado.includes('Login bem-sucedido')) {
-            alert('Login bem-sucedido!');
-            document.querySelector('.telaLogin').style.display = 'none';
-        } else {
-            alert('email ou senha incorretos.');
-        }
-    });
+   
 });
 
 const formularioCadastro = document.getElementById('cadastroForm');
