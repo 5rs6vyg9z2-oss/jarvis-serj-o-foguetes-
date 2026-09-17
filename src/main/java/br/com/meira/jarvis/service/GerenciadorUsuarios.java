@@ -1,6 +1,13 @@
+package br.com.meira.jarvis.service;
+
+import br.com.meira.jarvis.model.Usuario;
+import br.com.meira.jarvis.repository.UsuarioRepository;
 import java.util.List;
+import org.springframework.stereotype.Service;
+
 
 // Centraliza as regras de usuario entre a tela/terminal e o banco de dados.
+@Service
 public class GerenciadorUsuarios {
     // Lista em memoria usada pelo Jarvis enquanto o programa esta aberto.
     private List<Usuario> usuarios;
@@ -13,7 +20,7 @@ public class GerenciadorUsuarios {
         this(new UsuarioRepository());
     }
 
-    // Permite escolher outro arquivo de banco, util para teste ou configuracao futura.
+    // Permite escolher outra URL JDBC, util para teste ou configuracao futura.
     public GerenciadorUsuarios(String urlBanco) {
         this(new UsuarioRepository(urlBanco));
     }
@@ -47,13 +54,28 @@ public class GerenciadorUsuarios {
         return true;
     }
 
-    // Confere email e senha e devolve o usuario quando o login estiver correto.
+    // Mantem compatibilidade com as telas antigas que fazem login usando email e senha.
     public Usuario autenticar(String email, String senha) {
         String emailLimpo = limparTexto(email);
         String senhaLimpa = limparTexto(senha);
 
         for (Usuario usuario : usuarios) {
             if (usuario.getEmail().equals(emailLimpo) && usuario.getSenha().equals(senhaLimpa)) {
+                return usuario;
+            }
+        }
+
+        return null;
+    }
+
+    // Confere email e senha e devolve o usuario quando o login estiver correto.
+    public Usuario autenticar(String nome, String email, String senha) {
+        String nomeLimpo = limparTexto(nome);
+        String emailLimpo = limparTexto(email);
+        String senhaLimpa = limparTexto(senha);
+
+        for (Usuario usuario : usuarios) {
+            if (usuario.getNome().equals(nomeLimpo) && usuario.getEmail().equals(emailLimpo) && usuario.getSenha().equals(senhaLimpa)) {
                 return usuario;
             }
         }
@@ -119,6 +141,20 @@ public class GerenciadorUsuarios {
 
         usuario.setSenha(limparTexto(novaSenha));
         salvarUsuarios();
+    }
+
+    // Confere a senha atual antes de salvar a nova senha da conta informada.
+    public boolean alterarSenha(String email, String senhaAtual, String novaSenha) {
+        String novaSenhaLimpa = limparTexto(novaSenha);
+        Usuario usuario = autenticar(email, senhaAtual);
+
+        if (usuario == null || novaSenhaLimpa.isEmpty()) {
+            return false;
+        }
+
+        usuario.setSenha(novaSenhaLimpa);
+        salvarUsuarios();
+        return true;
     }
 
     // Altera apenas o nome do usuario recebido.
@@ -205,4 +241,5 @@ public class GerenciadorUsuarios {
 
         return texto.trim();
     }
+
 }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Jarvis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="janela">
+        <section class="cabecalho">
+            <h1>Projeto Jarvis</h1>
+        </section>
+
+        <section id="areaConversa" class="area-conversa">
+            <div class="mensagem jarvis">Jarvis: Ola! Eu sou o Jarvis, seu assistente virtual. Como posso ajuda-lo hoje?</div>
+        </section>
+
+        <form id="formMensagem" class="form-mensagem">
+            <input type="text" id="campoMensagem" placeholder="Digite sua mensagem...">
+            <button type="submit">Enviar</button>
+        </form>
+    </main>
+
+    <div class="telaLogin">
+        <div class="login-container">
+            <div id="telaLoginFormulario">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="password" id="senha" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                </form>
+
+                <button type="button" id="botaoMostrarCadastro">Criar conta</button>
+            </div>
+
+            <div id="telaCadastroFormulario" style="display: none;">
+                <h2>Cadastro</h2>
+                <form id="cadastroForm">
+                    <input type="text" id="nomeCadastro" placeholder="Nome" required>
+                    <input type="email" id="emailCadastro" placeholder="Email" required>
+                    <input type="password" id="senhaCadastro" placeholder="Senha" required>
+                    <button type="submit">Cadastrar</button>
+                </form>
+
+                <button type="button" id="botaoMostrarLogin">Ja tenho conta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=2"></script>
+</body>
+
+
+
+</html>

@@ -22,12 +22,18 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import br.com.meira.jarvis.service.GerenciadorUsuarios;
+import br.com.meira.jarvis.service.JarvisService;
+import br.com.meira.jarvis.model.Usuario;
+
 // Interface grafica principal do Jarvis, feita com Java Swing.
 public class JanelaJarvis {
     // Nomes das telas usadas pelo CardLayout para alternar entre login, cadastro e chat.
     private static final String TELA_LOGIN = "login";
     private static final String TELA_CADASTRO = "cadastro";
     private static final String TELA_CHAT = "chat";
+    private static final String TELA_SOBRE = "sobre";
+
 
     // Paleta visual da janela. Usar constantes evita repetir cores pelo codigo.
     private static final Color FUNDO = new Color(9, 12, 18);
@@ -97,6 +103,7 @@ public class JanelaJarvis {
         painelPrincipal.add(criarTelaLogin(), TELA_LOGIN);
         painelPrincipal.add(criarTelaCadastro(), TELA_CADASTRO);
         painelPrincipal.add(criarTelaChat(), TELA_CHAT);
+        painelPrincipal.add(criarTelaSobre(), TELA_SOBRE);
 
         janela.add(painelPrincipal);
         cardLayout.show(painelPrincipal, TELA_LOGIN);
@@ -219,6 +226,8 @@ public class JanelaJarvis {
         JScrollPane rolagem = new JScrollPane(areaConversa);
         rolagem.setBorder(BorderFactory.createLineBorder(BORDA));
 
+
+
         campoMensagem = criarCampoTexto();
         campoMensagem.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         // ActionListener no campo faz a tecla Enter enviar a mensagem.
@@ -230,6 +239,48 @@ public class JanelaJarvis {
 
         return tela;
     }
+
+    private JPanel criarTelaSobre() {
+        JPanel tela = criarTelaCentralizada();
+        JPanel cartao = criarCartao(420);
+
+        JLabel titulo = criarTitulo("Sobre Jarvis");
+        JLabel subtitulo = criarSubtitulo("Este é um assistente virtual desenvolvido em Java Swing.");
+        JTextArea text = new JTextArea();
+        text.setEditable(false);
+        text.setLineWrap(true);
+        text.setWrapStyleWord(true);
+        text.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        text.setForeground(TEXTO);
+        text.setBackground(PAINEL);
+        text.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        text.append("Ele permite que você interaja com o sistema, faça perguntas e execute comandos.\n\n");
+        text.append("Funcionalidades:\n");
+        text.append("- Login e cadastro de usuários.\n");
+        text.append("- Chat interativo com respostas automatizadas.\n");
+        text.append("- Comandos para gerenciar usuários (cadastrar, excluir, alterar email).\n");
+        JScrollPane rolagem = new JScrollPane(text);
+        rolagem.setBorder(BorderFactory.createLineBorder(BORDA));
+        adicionarLinha(cartao, rolagem, 2);
+
+        JButton botaoVoltar = criarBotaoSecundario("Voltar para login");
+        botaoVoltar.addActionListener(evento -> {
+            limparLogin();
+            cardLayout.show(painelPrincipal, TELA_LOGIN);
+            campoEmailLogin.requestFocusInWindow();
+        });
+
+        adicionarLinha(cartao, titulo, 0);
+        adicionarLinha(cartao, subtitulo, 1);
+        adicionarEspaco(cartao, 2, 12);
+        adicionarLinha(cartao, botaoVoltar, 3);
+
+        tela.add(cartao);
+        return tela;
+    }
+    // Limite de tentativas de login para evitar ataques de força bruta.
+    private static final int LIMITE_TENTATIVAS_LOGIN = 3;
+    private int tentativasLogin = 0;
 
     // Le os campos de login, valida e pede autenticacao ao GerenciadorUsuarios.
     private void entrar() {
@@ -243,7 +294,13 @@ public class JanelaJarvis {
         Usuario usuario = gerenciadorUsuarios.autenticar(email, senha);
 
         if (usuario == null) {
-            mostrarAviso("Email ou senha incorretos.");
+            tentativasLogin++;
+            if (tentativasLogin >= LIMITE_TENTATIVAS_LOGIN) {
+                mostrarAviso("Numero maximo de tentativas de login atingido.");
+                System.exit(0);
+            } else {
+                mostrarAviso("Email ou senha incorretos.");
+            }
             return;
         }
 

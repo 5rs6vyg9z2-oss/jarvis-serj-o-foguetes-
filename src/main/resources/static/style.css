@@ -1,0 +1,218 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #0b1020;
+    color: #e5e7eb;
+}
+
+.janela {
+    width: min(900px, 92vw);
+    height: 90vh;
+    margin: 5vh auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #111827;
+    border: 1px solid #1f2937;
+}
+
+.cabecalho {
+    padding: 20px;
+    border-bottom: 1px solid #1f2937;
+    text-align: center;
+}
+
+.cabecalho h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #f9fafb;
+}
+
+.area-conversa {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.mensagem {
+    max-width: 75%;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    background-color: #1f2937;
+    border-radius: 8px;
+    line-height: 1.4;
+}
+
+.mensagem.jarvis {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+.form-mensagem {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #1f2937;
+}
+
+.form-mensagem input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #1f2937;
+    border-radius: 4px;
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+.form-mensagem button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #2563eb;
+    color: #f9fafb;
+    cursor: pointer;
+}
+
+.form-mensagem button:hover {
+    background-color: #1d4ed8;
+}
+
+.telaLogin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: #1f2937;
+    padding: 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #f9fafb;
+}
+
+.login-container input[type="text"],
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #1f2937;
+    border-radius: 4px;
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #2563eb;
+    color: #f9fafb;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background-color: #1d4ed8;
+}
+
+.telaCadastro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cadastro-container {
+    background-color: #1f2937;
+    padding: 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.cadastro-container h2 {
+    margin-bottom: 20px;
+    color: #f9fafb;
+}
+
+.cadastro-container input[type="text"],
+.cadastro-container input[type="email"],
+.cadastro-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #1f2937;
+    border-radius: 4px;
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.cadastro-container button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #2563eb;
+    color: #f9fafb;
+    cursor: pointer;
+}
+
+.cadastro-container button:hover {
+    background-color: #1d4ed8;
+}
+
+.login-container button[type="button"]{
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    background-color: transparent;
+    color: #f9fafb;
+    cursor: pointer;
+}
+
+.login-container button[type="button"]:hover {
+    background-color: #111827;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.login-container input:focus{
+    outline: none;
+    border-color: #2563eb;
+}
+
+.login-container input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #111827 inset;
+    -webkit-text-fill-color: #f9fafb;
+    caret-color: #f9fafb;
+}
+
+.login-container input::placeholder {
+    color: #9ca3af;
+}
+
+.login-container input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background-color: #111827;
+    color: #f9fafb;
+}

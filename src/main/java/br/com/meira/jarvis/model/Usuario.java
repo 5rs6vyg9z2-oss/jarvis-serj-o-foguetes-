@@ -1,3 +1,5 @@
+package br.com.meira.jarvis.model;
+
 // Modelo de dados: representa uma pessoa cadastrada no Jarvis.
 public class Usuario {
     // Campos privados protegem os dados; o acesso acontece por getters e setters.
