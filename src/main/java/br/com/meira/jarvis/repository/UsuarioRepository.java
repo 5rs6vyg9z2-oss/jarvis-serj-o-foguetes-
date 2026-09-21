@@ -70,40 +70,47 @@ public class UsuarioRepository {
         return usuarios;
     }
 
-    // Salva a lista inteira de usuarios no banco em uma unica transacao.
-    public void salvarTodos(List<Usuario> usuarios) {
-        String apagarSql = "DELETE FROM usuarios";
-        String inserirSql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+    // Insere somente o usuario novo, sem regravar a tabela inteira.
+    public void inserirUsuario(Usuario usuario) {
+        String sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
 
-        try (Connection conexao = conectar()) {
-            // AutoCommit falso permite confirmar tudo junto ou desfazer se der erro.
-            conexao.setAutoCommit(false);
-
-            try (Statement apagar = conexao.createStatement();
-                    PreparedStatement inserir = conexao.prepareStatement(inserirSql)) {
-
-                apagar.executeUpdate(apagarSql);
-
-                for (Usuario usuario : usuarios) {
-                    inserir.setString(1, usuario.getNome());
-                    inserir.setString(2, usuario.getEmail());
-                    inserir.setString(3, usuario.getSenha());
-                    inserir.addBatch();
-                }
-
-                inserir.executeBatch();
-                conexao.commit();
-            } catch (SQLException e) {
-                try {
-                    conexao.rollback();
-                } catch (SQLException erroRollback) {
-                    e.addSuppressed(erroRollback);
-                }
-
-                throw erroBanco("salvar usuarios", e);
-            }
+        try (Connection conexao = conectar();
+                PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setString(1, usuario.getNome());
+            comando.setString(2, usuario.getEmail());
+            comando.setString(3, usuario.getSenha());
+            comando.executeUpdate();
         } catch (SQLException e) {
-            throw erroBanco("conectar ao banco", e);
+            throw erroBanco("inserir usuario", e);
+        }
+    }
+
+    // Atualiza um unico registro; o email atual identifica a conta de forma unica.
+    public boolean atualizarUsuario(String emailAtual, Usuario usuarioAtualizado) {
+        String sql = "UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE email = ?";
+
+        try (Connection conexao = conectar();
+                PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setString(1, usuarioAtualizado.getNome());
+            comando.setString(2, usuarioAtualizado.getEmail());
+            comando.setString(3, usuarioAtualizado.getSenha());
+            comando.setString(4, emailAtual);
+            return comando.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw erroBanco("atualizar usuario", e);
+        }
+    }
+
+    // Exclui somente o registro identificado pelo email unico.
+    public boolean excluirUsuarioPorEmail(String email) {
+        String sql = "DELETE FROM usuarios WHERE email = ?";
+
+        try (Connection conexao = conectar();
+                PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setString(1, email);
+            return comando.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw erroBanco("excluir usuario", e);
         }
     }
 
