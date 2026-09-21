@@ -1,5 +1,8 @@
 package br.com.meira.jarvis.controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,21 +29,28 @@ public class JarvisController {
     }
 
     @GetMapping("/mensagem")
-    public String mensagem(@RequestParam String texto) {
-        return jarvisService.processarComando(texto);
+    public ResponseEntity<String> mensagem(@RequestParam String texto, HttpSession sessao) {
+        if (!sessaoAtiva(sessao)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("faca login antes de conversar com o Jarvis.");
+        }
+
+        return ResponseEntity.ok(jarvisService.processarComando(texto));
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession sessao) {
         Usuario usuario = gerenciadorUsuarios.autenticar(
                 loginRequest.getEmail(),
                 loginRequest.getSenha());
 
         if (usuario != null) {
-            return "Login bem-sucedido! Usuario: " + usuario.getNome();
+            sessao.setAttribute("usuarioEmail", usuario.getEmail());
+            sessao.setAttribute("usuarioNome", usuario.getNome());
+            return ResponseEntity.ok("Login bem-sucedido! Usuario: " + usuario.getNome());
         }
 
-        return "Credenciais invalidas.";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais invalidas.");
     }
 
     @PostMapping("/cadastro")
@@ -60,17 +70,28 @@ public class JarvisController {
     }
 
     @PostMapping("/alterar-senha")
-    public String alterarSenha(@RequestBody AlterarSenhaRequest alterarSenhaRequest) {
+    public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhaRequest alterarSenhaRequest, HttpSession sessao) {
+        String emailLogado = (String) sessao.getAttribute("usuarioEmail");
+        if (emailLogado == null || !emailLogado.equals(alterarSenhaRequest.getEmail())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("faca login na conta cuja senha deseja alterar.");
+        }
+
         boolean alterada = gerenciadorUsuarios.alterarSenha(
                 alterarSenhaRequest.getEmail(),
                 alterarSenhaRequest.getSenhaAtual(),
                 alterarSenhaRequest.getNovaSenha());
 
         if (alterada) {
-            return "Senha alterada com sucesso.";
+            return ResponseEntity.ok("Senha alterada com sucesso.");
         }
 
-        return "Nao foi possivel alterar a senha. Confira o email e a senha atual.";
+        return ResponseEntity.badRequest()
+                .body("Nao foi possivel alterar a senha. Confira o email e a senha atual.");
+    }
+
+    private boolean sessaoAtiva(HttpSession sessao) {
+        return sessao.getAttribute("usuarioEmail") != null;
     }
 }
 

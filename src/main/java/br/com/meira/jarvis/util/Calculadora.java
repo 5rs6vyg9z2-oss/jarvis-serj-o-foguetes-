@@ -82,21 +82,26 @@ public class Calculadora {
         }
     }
     private String normalizarExpressao(String expressao) {
-       String texto = expressao.trim().toLowerCase();
-       return texto
-               .replace("x", "*")
-               .replace("vezes", "*")
-               .replace("multiplicar", "*")
-               .replace("multiplicado por", "*")
-               .replace("dividido por", "/")
-               .replace("dividido", "/")
-               .replace("dividir por", "/")
-               .replace("dividir", "/")
-               .replace("adicionar", "+")
-               .replace("somar", "+")
-               .replace("mais", "+")
-               .replace("subtrair", "-")
-               .replace("menos", "-");
+        if (expressao == null) {
+            return "";
+        }
+
+        String texto = expressao.trim().toLowerCase().replace(',', '.');
+
+        return texto
+                .replace("multiplicado por", "*")
+                .replace("multiplicar", "*")
+                .replace("vezes", "*")
+                .replace("dividido por", "/")
+                .replace("dividir por", "/")
+                .replace("dividido", "/")
+                .replace("dividir", "/")
+                .replace("adicionar", "+")
+                .replace("somar", "+")
+                .replace("mais", "+")
+                .replace("subtrair", "-")
+                .replace("menos", "-")
+                .replaceAll("(?<=\\d)\\s*x\\s*(?=\\d)", "*");
 
     }
     

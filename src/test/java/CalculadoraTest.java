@@ -77,6 +77,22 @@ public class CalculadoraTest {
     }
 
     @Test
+    @DisplayName("Should calculate multiplication written with vezes")
+    void testCalcularMultiplicacaoComVezes() {
+        String resultado = calculadora.calcular("2 vezes 3");
+
+        assertTrue(resultado.contains("6"));
+    }
+
+    @Test
+    @DisplayName("Should calculate decimal values written with comma")
+    void testCalcularDecimalComVirgula() {
+        String resultado = calculadora.calcular("2,5 mais 0,5");
+
+        assertTrue(resultado.contains("3.0"));
+    }
+
+    @Test
     @DisplayName("Should calculate division")
     void testCalcularDivisao() {
         String resultado = calculadora.calcular("20/4");

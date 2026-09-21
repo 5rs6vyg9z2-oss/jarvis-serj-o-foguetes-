@@ -7,19 +7,25 @@ formMensagem.addEventListener('submit', function(event) {
     const mensagemUsuario = campoMensagem.value.trim();
     if (mensagemUsuario === '') return;
 
-    const mensagemElemento = document.createElement('div');
-    mensagemElemento.className = 'mensagem usuario';
-    mensagemElemento.textContent = 'Voce: ' + mensagemUsuario;
-    areaConversa.appendChild(mensagemElemento);
+    adicionarMensagem('usuario', 'Voce: ' + mensagemUsuario);
+    campoMensagem.value = '';
+
     fetch('/mensagem?texto=' + encodeURIComponent(mensagemUsuario))
-        .then(response => response.text())
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+
+            return response.text().then(mensagemErro => {
+                throw new Error(mensagemErro);
+            });
+        })
         .then(respostaJarvis => {
-            const mensagemJarvisElemento = document.createElement('div');
-            mensagemJarvisElemento.className = 'mensagem jarvis';
-            mensagemJarvisElemento.textContent = 'Jarvis: ' + respostaJarvis;
-            areaConversa.appendChild(mensagemJarvisElemento);
-            campoMensagem.value = '';
-            areaConversa.scrollTop = areaConversa.scrollHeight;
+            adicionarMensagem('jarvis', 'Jarvis: ' + respostaJarvis);
+        })
+        .catch(erro => {
+            const mensagemErro = erro.message || 'Nao foi possivel conectar ao Jarvis.';
+            adicionarMensagem('jarvis', 'Jarvis: ' + mensagemErro);
         });
 });
 
@@ -38,11 +44,17 @@ formularioLogin.addEventListener('submit', function(event) {
     .then(response => response.text())
     .then(resultado => {
         if (resultado.includes('Login bem-sucedido')) {
-            alert('Login bem-sucedido!');
-            document.querySelector('.telaLogin').style.display = 'none';
-        } else {
-            alert('email ou senha incorretos.');
+            mensagemLogin.textContent = '';
+            telaLogin.style.display = 'none';
+            telaChat.style.display = 'flex';
+            campoMensagem.focus();
+            return;
         }
+
+        mostrarMensagem(mensagemLogin, resultado, false);
+    })
+    .catch(() => {
+        mostrarMensagem(mensagemLogin, 'Nao foi possivel conectar ao Jarvis.', false);
     });
 });
 
@@ -62,12 +74,15 @@ formularioCadastro.addEventListener('submit', function(event) {
     .then(response => response.text())
     .then(resultado => {
         if (resultado.includes('Cadastro bem-sucedido')) {
-            alert('Cadastro bem-sucedido!');
             telaCadastroFormulario.style.display = 'none';
             telaLoginFormulario.style.display = 'block';
+            mostrarMensagem(mensagemLogin, 'Cadastro realizado. Agora entre na sua conta.', true);
         } else {
-            alert('Erro ao cadastrar. Tente novamente.');
+            mostrarMensagem(mensagemCadastro, resultado, false);
         }
+    })
+    .catch(() => {
+        mostrarMensagem(mensagemCadastro, 'Nao foi possivel conectar ao Jarvis.', false);
     });
 });
 
@@ -75,15 +90,23 @@ const telaLoginFormulario = document.getElementById('telaLoginFormulario');
 const telaCadastroFormulario = document.getElementById('telaCadastroFormulario');
 const botaoMostrarCadastro = document.getElementById('botaoMostrarCadastro');
 const botaoMostrarLogin = document.getElementById('botaoMostrarLogin');
+const telaInicial = document.getElementById('tela-inicial');
+const telaLogin = document.querySelector('.telaLogin');
+const telaChat = document.querySelector('.janela');
+const botaoEntrar = document.getElementById('botao-entrar');
+const mensagemLogin = document.getElementById('mensagemLogin');
+const mensagemCadastro = document.getElementById('mensagemCadastro');
 
 
 
 botaoMostrarCadastro.addEventListener('click', function() {
+    mensagemCadastro.textContent = '';
     telaLoginFormulario.style.display = 'none';
     telaCadastroFormulario.style.display = 'block';
 });
 
 botaoMostrarLogin.addEventListener('click', function() {
+    mensagemLogin.textContent = '';
     telaCadastroFormulario.style.display = 'none';
     telaLoginFormulario.style.display = 'block';
 });
@@ -128,3 +151,31 @@ campoSenhaCadastro.addEventListener('keydown', function(event) {
         formularioCadastro.requestSubmit();
     }
 });
+
+function abrirLogin() {
+    telaInicial.style.display = 'none';
+    telaLogin.style.display = 'flex';
+    campoEmailLogin.focus();
+}
+
+botaoEntrar.addEventListener('click', abrirLogin);
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && telaInicial.style.display !== 'none') {
+        event.preventDefault();
+        botaoEntrar.click();
+    }
+});
+
+function mostrarMensagem(elemento, texto, sucesso) {
+    elemento.textContent = texto;
+    elemento.classList.toggle('sucesso', sucesso);
+}
+
+function adicionarMensagem(tipo, texto) {
+    const mensagemElemento = document.createElement('div');
+    mensagemElemento.className = 'mensagem ' + tipo;
+    mensagemElemento.textContent = texto;
+    areaConversa.appendChild(mensagemElemento);
+    areaConversa.scrollTop = areaConversa.scrollHeight;
+}
