@@ -25,6 +25,19 @@ public class JarvisService {
         }
 
         switch (intencao) {
+
+            case "lembrarDeUsuario":
+                return responderMemoriaUsuario();
+
+            case "responderPerguntaUsuario":
+                return responderPerguntaUsuario();
+
+            case "saudacao":
+                return responderSaudacao();
+
+            case "lembrar usuario":
+                return responderMemoriaUsuario();
+
             case "hora":
             case "data":
                 return processarDataHoraComando(texto);
@@ -34,13 +47,15 @@ public class JarvisService {
 
             case "excluir usuario":
             case "alterar usuario":
-            case "adicionar usuario":
             case "listar usuarios":
             case "alterar senha":
                 String respostaUsuario = processarComandos(texto);
                 return respostaUsuario != null
                         ? respostaUsuario
                         : "comando de usuario incompleto. Tente informar todos os dados pedidos.";
+
+            case "adicionar usuario":
+                return orientarCadastroUsuario();
 
             default:
                 return respostaDesconhecida();
@@ -75,10 +90,6 @@ public class JarvisService {
 
         if (comando.startsWith("alterar email")) {
             return alterarEmail(texto);
-        }
-
-        if (comando.startsWith("adicionar usuario")) {
-            return adicionarUsuario(texto);
         }
 
         if (comando.startsWith("alterar senha")) {
@@ -228,28 +239,9 @@ public class JarvisService {
         return "nao foi possivel alterar o email. Confira o email antigo e se o novo ja nao esta em uso.";
     }
 
-    // Formato: adicionar usuario nome com email email@exemplo.com.
-    private String adicionarUsuario(String texto) {
-        String resto = extrairRestoDoComando(texto, "adicionar usuario");
-        if (resto == null) {
-            return "informe o usuario no formato: adicionar usuario Nome com email email@exemplo.com.";
-        }
-
-        String marcador = " com email ";
-        int indiceEmail = resto.toLowerCase().indexOf(marcador);
-        if (indiceEmail < 1 || indiceEmail + marcador.length() >= resto.length()) {
-            return "informe o usuario no formato: adicionar usuario Nome com email email@exemplo.com.";
-        }
-
-        String nome = resto.substring(0, indiceEmail).trim();
-        String email = resto.substring(indiceEmail + marcador.length()).trim();
-        boolean adicionado = gerenciadorUsuarios.adicionarUsuario(new Usuario(nome, email, "senhaPadrao"));
-
-        if (adicionado) {
-            return "usuario adicionado com sucesso: " + nome;
-        }
-
-        return "nao foi possivel adicionar usuario. Confira se os dados estao preenchidos e se o email ja nao existe.";
+    // Senhas nao devem ser enviadas pela conversa, pois a rota de mensagem usa GET.
+    private String orientarCadastroUsuario() {
+        return "para criar uma conta, use o botao Criar conta na tela de login.";
     }
 
     // Senhas nao devem ser enviadas pela conversa, pois a rota de mensagem usa GET.
@@ -275,12 +267,37 @@ public class JarvisService {
         return "hoje e " + Datahora.obterDataAtual();
     }
 
+    private String responderSaudacao() {
+        return "ola! Eu sou o Jarvis. Como posso ajudar?";
+    }
+
+    private String responderPerguntaUsuario(){
+        return "ta tudo bem sim,serei uma ia muito grande e forte!! voce e normal de perguntar se uma maquina esta bem ou mal?";
+    }
+
+    private String responderMemoriaUsuario() {
+        return "ainda nao consigo identificar sua conta apenas pela conversa. Estou evoluindo essa parte da sessao.";
+    }
+
     private String identificarIntencao(String mensagem) {
         if (mensagem == null || mensagem.isBlank()) {
             return null;
         }
 
-        String texto = mensagem.trim().toLowerCase();
+        String texto = normalizarTexto(mensagem);
+
+        
+        if (texto.contains("ola, como vai") || texto.contains("tudo bem") || texto.contains("como voce esta")) {
+            return "responderPerguntaUsuario";
+        }
+
+        if (ehSaudacao(texto)) {
+            return "saudacao";
+        }
+
+        if (texto.contains("lembra de mim") || texto.contains("me conhece")) {
+            return "lembrar usuario";
+        }
 
         if (texto.contains("senha") && (texto.contains("alterar") || texto.contains("mudar")
                 || texto.contains("trocar") || texto.contains("modificar"))) {
@@ -323,6 +340,23 @@ public class JarvisService {
         }
 
         return null;
+    }
+
+    private boolean ehSaudacao(String texto) {
+        return texto.equals("ola")
+                || texto.equals("oi")
+                || texto.equals("ola jarvis")
+                || texto.equals("oi jarvis")
+                || texto.equals("bom dia")
+                || texto.equals("boa tarde")
+                || texto.equals("boa noite")
+                || texto.equals("ola tudo bem")
+                || texto.equals("bom dia como vai");
+    }
+
+    private String normalizarTexto(String texto) {
+        return java.text.Normalizer.normalize(texto.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
     }
 
     private String extrairRestoDoComando(String texto, String inicio) {

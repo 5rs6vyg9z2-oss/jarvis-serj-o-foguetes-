@@ -2,7 +2,9 @@ package br.com.meira.jarvis.service;
 
 import br.com.meira.jarvis.model.Usuario;
 import br.com.meira.jarvis.repository.UsuarioRepository;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -10,10 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class GerenciadorUsuarios {
     // Lista em memoria usada pelo Jarvis enquanto o programa esta aberto.
-    private List<Usuario> usuarios;
+    private final List<Usuario> usuarios;
 
     // Repository faz a parte de persistencia: gravar e buscar no PostgreSQL.
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder codificadorDeSenha = new BCryptPasswordEncoder();
 
     // Usa o banco padrao do projeto.
     public GerenciadorUsuarios() {
@@ -28,7 +31,7 @@ public class GerenciadorUsuarios {
     // Recebe um repository pronto e ja carrega os usuarios salvos.
     public GerenciadorUsuarios(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
-        this.usuarios = usuarioRepository.listarTodos();
+        this.usuarios = new ArrayList<>(usuarioRepository.listarTodos());
     }
 
     // Valida, evita email repetido, adiciona na lista e salva no banco.
@@ -49,8 +52,9 @@ public class GerenciadorUsuarios {
             return false;
         }
 
-        usuarios.add(new Usuario(nome, email, senha));
-        salvarUsuarios();
+        Usuario novoUsuario = new Usuario(nome, email, codificarSenha(senha));
+        usuarioRepository.inserirUsuario(novoUsuario);
+        usuarios.add(novoUsuario);
         return true;
     }
 
@@ -60,7 +64,8 @@ public class GerenciadorUsuarios {
         String senhaLimpa = limparTexto(senha);
 
         for (Usuario usuario : usuarios) {
-            if (usuario.getEmail().equals(emailLimpo) && usuario.getSenha().equals(senhaLimpa)) {
+            if (usuario.getEmail().equals(emailLimpo) && senhaConfere(senhaLimpa, usuario)) {
+                migrarSenhaLegada(usuario, senhaLimpa);
                 return usuario;
             }
         }
@@ -75,7 +80,9 @@ public class GerenciadorUsuarios {
         String senhaLimpa = limparTexto(senha);
 
         for (Usuario usuario : usuarios) {
-            if (usuario.getNome().equals(nomeLimpo) && usuario.getEmail().equals(emailLimpo) && usuario.getSenha().equals(senhaLimpa)) {
+            if (usuario.getNome().equals(nomeLimpo) && usuario.getEmail().equals(emailLimpo)
+                    && senhaConfere(senhaLimpa, usuario)) {
+                migrarSenhaLegada(usuario, senhaLimpa);
                 return usuario;
             }
         }
@@ -85,7 +92,7 @@ public class GerenciadorUsuarios {
 
     // Devolve a lista atual para telas, comandos e testes consultarem.
     public List<Usuario> getUsuarios() {
-        return usuarios;
+        return List.copyOf(usuarios);
     }
 
     // Remove um Usuario especifico da lista e atualiza o banco se conseguiu remover.
@@ -94,13 +101,11 @@ public class GerenciadorUsuarios {
             return false;
         }
 
-        boolean removido = usuarios.remove(usuario);
-
-        if (removido) {
-            salvarUsuarios();
+        if (!usuarioRepository.excluirUsuarioPorEmail(usuario.getEmail())) {
+            return false;
         }
 
-        return removido;
+        return usuarios.remove(usuario);
     }
 
     // Atualiza todos os dados principais de um usuario ja existente.
@@ -109,10 +114,21 @@ public class GerenciadorUsuarios {
             return;
         }
 
-        usuario.setNome(limparTexto(novoNome));
-        usuario.setEmail(limparTexto(novoEmail));
-        usuario.setSenha(limparTexto(novaSenha));
-        salvarUsuarios();
+        String emailAtual = usuario.getEmail();
+        Usuario atualizado = new Usuario(
+                limparTexto(novoNome),
+                limparTexto(novoEmail),
+                codificarSenha(limparTexto(novaSenha)));
+
+        if (atualizado.getNome().isEmpty() || atualizado.getEmail().isEmpty() || novaSenha == null || novaSenha.isBlank()) {
+            return;
+        }
+
+        if (usuarioRepository.atualizarUsuario(emailAtual, atualizado)) {
+            usuario.setNome(atualizado.getNome());
+            usuario.setEmail(atualizado.getEmail());
+            usuario.setSenha(atualizado.getSenha());
+        }
     }
 
     // Procura na lista em memoria pelo email informado.
@@ -134,13 +150,23 @@ public class GerenciadorUsuarios {
     }
 
     // Altera apenas a senha do usuario recebido.
-    public void alterarSenha(Usuario usuario, String novaSenha) {
+    public boolean alterarSenha(Usuario usuario, String novaSenha) {
         if (usuario == null) {
-            return;
+            return false;
         }
 
-        usuario.setSenha(limparTexto(novaSenha));
-        salvarUsuarios();
+        String novaSenhaLimpa = limparTexto(novaSenha);
+        if (novaSenhaLimpa.isEmpty()) {
+            return false;
+        }
+
+        Usuario atualizado = new Usuario(usuario.getNome(), usuario.getEmail(), codificarSenha(novaSenhaLimpa));
+        if (!usuarioRepository.atualizarUsuario(usuario.getEmail(), atualizado)) {
+            return false;
+        }
+
+        usuario.setSenha(atualizado.getSenha());
+        return true;
     }
 
     // Confere a senha atual antes de salvar a nova senha da conta informada.
@@ -152,19 +178,27 @@ public class GerenciadorUsuarios {
             return false;
         }
 
-        usuario.setSenha(novaSenhaLimpa);
-        salvarUsuarios();
-        return true;
+        return alterarSenha(usuario, novaSenhaLimpa);
     }
 
     // Altera apenas o nome do usuario recebido.
-    public void alterarNome(Usuario usuario, String novoNome) {
+    public boolean alterarNome(Usuario usuario, String novoNome) {
         if (usuario == null) {
-            return;
+            return false;
         }
 
-        usuario.setNome(limparTexto(novoNome));
-        salvarUsuarios();
+        String novoNomeLimpo = limparTexto(novoNome);
+        if (novoNomeLimpo.isEmpty()) {
+            return false;
+        }
+
+        Usuario atualizado = new Usuario(novoNomeLimpo, usuario.getEmail(), usuario.getSenha());
+        if (!usuarioRepository.atualizarUsuario(usuario.getEmail(), atualizado)) {
+            return false;
+        }
+
+        usuario.setNome(novoNomeLimpo);
+        return true;
     }
 
     // Versao usada por comandos de texto: acha pelo nome antigo e troca pelo novo.
@@ -177,10 +211,8 @@ public class GerenciadorUsuarios {
         }
 
         for (Usuario usuario : usuarios) {
-            if (usuario.getNome().equals(nomeAntigoLimpo)) {
-                usuario.setNome(novoNomeLimpo);
-                salvarUsuarios();
-                return true;
+            if (usuario.getNome().equalsIgnoreCase(nomeAntigoLimpo)) {
+                return alterarNome(usuario, novoNomeLimpo);
             }
         }
 
@@ -206,8 +238,12 @@ public class GerenciadorUsuarios {
             return false;
         }
 
+        Usuario atualizado = new Usuario(usuario.getNome(), emailNovoLimpo, usuario.getSenha());
+        if (!usuarioRepository.atualizarUsuario(emailAntigoLimpo, atualizado)) {
+            return false;
+        }
+
         usuario.setEmail(emailNovoLimpo);
-        salvarUsuarios();
         return true;
     }
 
@@ -218,9 +254,12 @@ public class GerenciadorUsuarios {
         for (int i = 0; i < usuarios.size(); i++) {
             Usuario usuario = usuarios.get(i);
 
-            if (usuario.getNome().equals(nomeLimpo)) {
+            if (usuario.getNome().equalsIgnoreCase(nomeLimpo)) {
+                if (!usuarioRepository.excluirUsuarioPorEmail(usuario.getEmail())) {
+                    return false;
+                }
+
                 usuarios.remove(i);
-                salvarUsuarios();
                 return true;
             }
         }
@@ -228,9 +267,31 @@ public class GerenciadorUsuarios {
         return false;
     }
 
-    // Toda mudanca na lista passa por aqui para manter memoria e banco sincronizados.
-    private void salvarUsuarios() {
-        usuarioRepository.salvarTodos(usuarios);
+    private boolean senhaConfere(String senhaDigitada, Usuario usuario) {
+        if (senhaUsaHash(usuario.getSenha())) {
+            return codificadorDeSenha.matches(senhaDigitada, usuario.getSenha());
+        }
+
+        return usuario.getSenha().equals(senhaDigitada);
+    }
+
+    private void migrarSenhaLegada(Usuario usuario, String senhaDigitada) {
+        if (senhaUsaHash(usuario.getSenha())) {
+            return;
+        }
+
+        Usuario atualizado = new Usuario(usuario.getNome(), usuario.getEmail(), codificarSenha(senhaDigitada));
+        if (usuarioRepository.atualizarUsuario(usuario.getEmail(), atualizado)) {
+            usuario.setSenha(atualizado.getSenha());
+        }
+    }
+
+    private boolean senhaUsaHash(String senha) {
+        return senha != null && senha.startsWith("$2");
+    }
+
+    private String codificarSenha(String senha) {
+        return codificadorDeSenha.encode(senha);
     }
 
     // Evita null e remove espacos extras das pontas do texto.

@@ -10,32 +10,29 @@
 
 <body>
 
-    <section id="tela-inicial">  
-    <header>
-        <p>JARVIS</p>
-        <SPAN>Projeto De Portifólio</SPAN>
-      </header>
-
-      <main>
-        <p>Assistente pessoal em desenvolvimento em java</p>
+   <section id="tela-inicial">
+    <div class="conteudo-inicial">
+        <p class="marca">JARVIS</p>
+        <p class="tipo-projeto">Projeto de portfólio</p>
 
         <h1>Jarvis</h1>
 
-        <p>
-
-            Um Projeto criado para fins de estudo e desenvolvimento de sistema com diversas aplicaçoes em testes. 
-            espero que goste do projeto e por favor nos diga como você acha que pode melhorar?!
+        <p class="descricao-inicial">
+            Assistente pessoal em desenvolvimento com Java,
+            Spring Boot, banco de dados e API.
         </p>
 
-        <p> Em desenvolvimento oficial 3 meses de projeto solo</p>
+        <p class="status-projeto">
+            Em desenvolvimento oficial: 3 meses de projeto solo.
+        </p>
 
-        <button type="button" id="botao-entrar"
-          entrar no jarvis
-    </button>
+        <button type="button" id="botao-entrar">
+            Entrar no Jarvis
+        </button>
 
-      </main>
-    </section>
-
+        <p class="aviso-enter">Pressione Enter para continuar</p>
+    </div>
+</section>
       
     <main class="janela">
         <section class="cabecalho">
@@ -62,6 +59,8 @@
                     <button type="submit">Entrar</button>
                 </form>
 
+                <p id="mensagemLogin" class="mensagem-formulario" aria-live="polite"></p>
+
                 <button type="button" id="botaoMostrarCadastro">Criar conta</button>
             </div>
 
@@ -73,6 +72,8 @@
                     <input type="password" id="senhaCadastro" placeholder="Senha" required>
                     <button type="submit">Cadastrar</button>
                 </form>
+
+                <p id="mensagemCadastro" class="mensagem-formulario" aria-live="polite"></p>
 
                 <button type="button" id="botaoMostrarLogin">Ja tenho conta</button>
             </div>
