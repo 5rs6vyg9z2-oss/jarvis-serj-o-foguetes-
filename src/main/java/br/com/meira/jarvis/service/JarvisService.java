@@ -26,6 +26,12 @@ public class JarvisService {
 
         switch (intencao) {
 
+            case "agradecerUsuario":
+                return agradecerUsuario();
+
+            case "perguntaPadrao":
+                return perguntaPadrao();
+
             case "lembrarDeUsuario":
                 return responderMemoriaUsuario();
 
@@ -286,10 +292,25 @@ public class JarvisService {
 
         String texto = normalizarTexto(mensagem);
 
+           if (texto.contains("obrigado")
+              || (texto.contains("voce e o melhor"))
+              || (texto.contains("caraca que incrivel"))
+              || (texto.contains("vlw"))
+              ||(texto.contains("valeu"))){
+                return "agradecerUsuario";
+              }
+
+            if (texto.contains("oque voce faz")
+                 || (texto.contains("qual suas funções"))
+                 || (texto.contains("quais suas habilidades"))){
+                 return "perguntaPadrao";
+                 }
         
-        if (texto.contains("ola, como vai") || texto.contains("tudo bem") || texto.contains("como voce esta")) {
-            return "responderPerguntaUsuario";
-        }
+            if (texto.contains("ola, como vai")
+                  || texto.contains("tudo bem")
+                  || texto.contains("como voce esta")) {
+              return "responderPerguntaUsuario";
+}
 
         if (ehSaudacao(texto)) {
             return "saudacao";
@@ -341,6 +362,15 @@ public class JarvisService {
 
         return null;
     }
+
+    private String agradecerUsuario(){
+        return "de nada meu amigo. eu ainda estarei aqui para te ajudar sempre que você precisar. meu criador me ensinou a ser como ele, amigavel gentil e prestativo.";
+    }
+
+        private String perguntaPadrao(){
+            return "minhas funções sao limitadas ao momento, mas eu posso fazer: cadastro,login,alteração de informações dos usuarios, calculadora, te informar data e hora. mas meu LINDO E BELO E FORTE criador esta me desenvolvendo com as vozes da cabeça dele.";
+
+        }
 
     private boolean ehSaudacao(String texto) {
         return texto.equals("ola")
