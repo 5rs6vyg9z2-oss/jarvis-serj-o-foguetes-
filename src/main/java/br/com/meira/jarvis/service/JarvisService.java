@@ -301,7 +301,7 @@ public class JarvisService {
               }
 
             if (texto.contains("oque voce faz")
-                 || (texto.contains("qual suas funções"))
+                 || (texto.contains("qual suas funcoes"))
                  || (texto.contains("quais suas habilidades"))){
                  return "perguntaPadrao";
                  }
