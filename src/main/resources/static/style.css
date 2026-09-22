@@ -277,6 +277,7 @@ body {
 @media (max-width: 600px) {
     .janela {
         width: 100%;
+        height: 100vh;
         height: 100dvh;
         margin: 0;
         border: none;
@@ -309,5 +310,9 @@ body {
 
     #tela-inicial h1 {
         font-size: 36px;
+    }
+    .login-container input,
+    .form-mensagem input[type="text"] {
+        font-size: 16px;
     }
 }
