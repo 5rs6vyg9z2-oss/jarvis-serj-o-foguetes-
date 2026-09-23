@@ -302,13 +302,16 @@ public class JarvisService {
 
             if (texto.contains("oque voce faz")
                  || (texto.contains("qual suas funcoes"))
-                 || (texto.contains("quais suas habilidades"))){
+                 || (texto.contains("quais suas habilidades"))
+                 || (texto.contains("o que voce faz"))){
                  return "perguntaPadrao";
                  }
         
             if (texto.contains("ola, como vai")
                   || texto.contains("tudo bem")
-                  || texto.contains("como voce esta")) {
+                  || texto.contains("como voce esta")
+                  || texto.contains("ta bem")
+                  || texto.contains("tranquilo")) {
               return "responderPerguntaUsuario";
 }
 
