@@ -50,6 +50,12 @@
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.openai</groupId>
+            <artifactId>openai-java</artifactId>
+            <version>4.69.3</version>
+        </dependency>
+
     </dependencies>
 
     <!-- Plugins adicionam comandos extras ao Maven, como executar e testar o projeto. -->

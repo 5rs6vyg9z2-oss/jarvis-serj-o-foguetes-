@@ -23,6 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import br.com.meira.jarvis.service.GerenciadorUsuarios;
+import br.com.meira.jarvis.service.IntegracaoIAService;
 import br.com.meira.jarvis.service.JarvisService;
 import br.com.meira.jarvis.model.Usuario;
 
@@ -77,7 +78,7 @@ public class JanelaJarvis {
     // O construtor prepara as dependencias que a janela vai usar.
     public JanelaJarvis() {
         gerenciadorUsuarios = new GerenciadorUsuarios();
-        jarvisService = new JarvisService(gerenciadorUsuarios);
+        jarvisService = new JarvisService(new IntegracaoIAService(), gerenciadorUsuarios);
     }
 
     // invokeLater cria a tela na thread correta do Swing.

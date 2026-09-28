@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.meira.jarvis.model.Usuario;
@@ -28,14 +27,20 @@ public class JarvisController {
         return "Jarvis API ta on.";
     }
 
-    @GetMapping("/mensagem")
-    public ResponseEntity<String> mensagem(@RequestParam String texto, HttpSession sessao) {
+    @PostMapping("/mensagem")
+    public ResponseEntity<String> mensagem(
+            @RequestBody MensagemRequest requisicao,
+            HttpSession sessao) {
         if (!sessaoAtiva(sessao)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("faca login antes de conversar com o Jarvis.");
+                    .body("faça login antes de conversar com o jarvis.");
         }
 
-        return ResponseEntity.ok(jarvisService.processarComando(texto));
+        if (requisicao.getTexto() == null || requisicao.getTexto().isBlank()) {
+            return ResponseEntity.badRequest().body("digite uma mensagem");
+        }
+
+        return ResponseEntity.ok(jarvisService.processarComando(requisicao.getTexto()));
     }
 
     @PostMapping("/login")
@@ -174,5 +179,18 @@ class AlterarSenhaRequest {
 
     public void setNovaSenha(String novaSenha) {
         this.novaSenha = novaSenha;
+    }
+
+}
+
+class MensagemRequest {
+    private String texto;
+
+    public String getTexto() {
+        return texto;
+    }
+
+    public void setTexto(String texto) {
+        this.texto = texto;
     }
 }

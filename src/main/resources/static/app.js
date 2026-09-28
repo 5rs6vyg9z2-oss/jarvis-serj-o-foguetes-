@@ -10,23 +10,29 @@ formMensagem.addEventListener('submit', function(event) {
     adicionarMensagem('usuario', 'Voce: ' + mensagemUsuario);
     campoMensagem.value = '';
 
-    fetch('/mensagem?texto=' + encodeURIComponent(mensagemUsuario))
-        .then(response => {
-            if (response.ok) {
-                return response.text();
-            }
+    fetch('/mensagem', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ texto: mensagemUsuario })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        }
 
-            return response.text().then(mensagemErro => {
-                throw new Error(mensagemErro);
-            });
-        })
-        .then(respostaJarvis => {
-            adicionarMensagem('jarvis', 'Jarvis: ' + respostaJarvis);
-        })
-        .catch(erro => {
-            const mensagemErro = erro.message || 'Nao foi possivel conectar ao Jarvis.';
-            adicionarMensagem('jarvis', 'Jarvis: ' + mensagemErro);
+        return response.text().then(mensagemErro => {
+            throw new Error(mensagemErro);
         });
+    })
+    .then(respostaJarvis => {
+        adicionarMensagem('jarvis', 'Jarvis: ' + respostaJarvis);
+    })
+    .catch(erro => {
+        const mensagemErro = erro.message || 'Nao foi possivel conectar ao Jarvis.';
+        adicionarMensagem('jarvis', 'Jarvis: ' + mensagemErro);
+    });
 });
 
 const formularioLogin = document.getElementById('loginForm');

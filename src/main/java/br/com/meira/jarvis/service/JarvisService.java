@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 public class JarvisService {
     private final GerenciadorUsuarios gerenciadorUsuarios;
     private final Calculadora calculadora;
+    private final IntegracaoIAService integracaoIAService;
 
-    public JarvisService(GerenciadorUsuarios gerenciadorUsuarios) {
+    public JarvisService(
+           IntegracaoIAService integracaoIAService,
+           GerenciadorUsuarios gerenciadorUsuarios){
         this.gerenciadorUsuarios = gerenciadorUsuarios;
         this.calculadora = new Calculadora();
+         this.integracaoIAService = integracaoIAService;
     }
 
     // Identifica a area do comando e encaminha para a classe ou metodo responsavel.
@@ -21,7 +25,7 @@ public class JarvisService {
         String intencao = identificarIntencao(texto);
 
         if (intencao == null) {
-            return respostaDesconhecida();
+            return integracaoIAService.responder(texto);
         }
 
         switch (intencao) {
@@ -302,13 +306,16 @@ public class JarvisService {
 
             if (texto.contains("oque voce faz")
                  || (texto.contains("qual suas funcoes"))
-                 || (texto.contains("quais suas habilidades"))){
+                 || (texto.contains("quais suas habilidades"))
+                 || (texto.contains("o que voce faz"))){
                  return "perguntaPadrao";
                  }
         
             if (texto.contains("ola, como vai")
                   || texto.contains("tudo bem")
-                  || texto.contains("como voce esta")) {
+                  || texto.contains("como voce esta")
+                  || texto.contains("ta bem")
+                  || texto.contains("tranquilo")) {
               return "responderPerguntaUsuario";
 }
 
