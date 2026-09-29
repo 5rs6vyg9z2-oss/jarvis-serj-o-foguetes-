@@ -1,6 +1,8 @@
 const formMensagem = document.getElementById('formMensagem');
 const campoMensagem = document.getElementById('campoMensagem');
 const areaConversa = document.getElementById('areaConversa');
+const indicadorPensando = document.getElementById('indicadorPensando');
+const botaoEnviar = formMensagem.querySelector('button[type="submit"]');
 
 formMensagem.addEventListener('submit', function(event) {
     event.preventDefault();
@@ -9,6 +11,9 @@ formMensagem.addEventListener('submit', function(event) {
 
     adicionarMensagem('usuario', 'Voce: ' + mensagemUsuario);
     campoMensagem.value = '';
+    indicadorPensando.hidden = false;
+    campoMensagem.disabled = true;
+    botaoEnviar.disabled = true;
 
     fetch('/mensagem', {
         method: 'POST',
@@ -32,6 +37,12 @@ formMensagem.addEventListener('submit', function(event) {
     .catch(erro => {
         const mensagemErro = erro.message || 'Nao foi possivel conectar ao Jarvis.';
         adicionarMensagem('jarvis', 'Jarvis: ' + mensagemErro);
+    })
+    .finally(() => {
+        indicadorPensando.hidden = true;
+        campoMensagem.disabled = false;
+        botaoEnviar.disabled = false;
+        campoMensagem.focus();
     });
 });
 

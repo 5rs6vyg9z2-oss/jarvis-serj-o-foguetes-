@@ -30,6 +30,7 @@ public class IntegracaoIAService {
 
     public String responder(String mensagem) {
         ResponseCreateParams parametros = ResponseCreateParams.builder()
+                .instructions("responda em portugues simples, nao em LaTeX nem formulas formatadas. para matematica explique palavras e mostre o resultado em decimal.")
                 .input(mensagem)
                 .model("openai/gpt-oss-20b")
                 .build();
