@@ -11,7 +11,9 @@ formMensagem.addEventListener('submit', function(event) {
 
     adicionarMensagem('usuario', 'Voce: ' + mensagemUsuario);
     campoMensagem.value = '';
+    areaConversa.appendChild(indicadorPensando);
     indicadorPensando.hidden = false;
+    areaConversa.scrollTop = areaConversa.scrollHeight;
     campoMensagem.disabled = true;
     botaoEnviar.disabled = true;
 
