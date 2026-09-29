@@ -17,13 +17,21 @@ public class IntegracaoIAService {
     private final OpenAIClient cliente;
 
     public IntegracaoIAService() {
-        this.cliente = OpenAIOkHttpClient.fromEnv();
+        String apiKey = System.getenv("GROQ_API_KEY");
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("Configure a variavel de ambiente GROQ_API_KEY.");
+        }
+
+        this.cliente = OpenAIOkHttpClient.builder()
+                .apiKey(apiKey)
+                .baseUrl("https://api.groq.com/openai/v1")
+                .build();
     }
 
     public String responder(String mensagem) {
         ResponseCreateParams parametros = ResponseCreateParams.builder()
                 .input(mensagem)
-                .model("gpt-6-astra")
+                .model("openai/gpt-oss-20b")
                 .build();
 
         try {
@@ -41,8 +49,8 @@ public class IntegracaoIAService {
 
     private String escolherMensagemDeLimite() {
         List<String> mensagens = List.of(
-                "A IA esta sem creditos ou atingiu um limite. Tente novamente mais tarde.",
-                "Nao consegui consultar a IA agora. Tente novamente depois.",
+                "o desenvolvedor e um duro e nao pagou.",
+                "desculpa, isso e igual celular precisa consultar os creditos da IA",
                 "A API esta sem saldo disponivel no momento.",
                 "o cara e pobre tu acha que ele pagou os tokens? resposta nao.");
 
