@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import br.com.meira.jarvis.model.Usuario;
 import br.com.meira.jarvis.service.GerenciadorUsuarios;
@@ -27,22 +29,25 @@ public class JarvisController {
         return "Jarvis API ta on.";
     }
 
-    @PostMapping("/mensagem")
+
+   
+    ("/mensagem")
     public ResponseEntity<String> mensagem(
-            @RequestBody MensagemRequest requisicao,
-            HttpSession sessao) {
-        if (!sessaoAtiva(sessao)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("faça login antes de conversar com o jarvis.");
+        @RequestBody MensagemRequest requisicao,
+        HttpSession sessao){
+            if (!sessaoAtiva(sessao)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                   .body("faça login antes de conversar com o jarvis.");
+            }
+
+            if (requisicao.getTexto() == null || requisicao.getTexto().isBlank()){
+                return ResponseEntity.badRequest().body("digite uma mensagem");
+            }
+            return ResponseEntity.ok(
+                jarvisService.processarComando(requisicao.getTexto()));
+            
         }
-
-        if (requisicao.getTexto() == null || requisicao.getTexto().isBlank()) {
-            return ResponseEntity.badRequest().body("digite uma mensagem");
-        }
-
-        return ResponseEntity.ok(jarvisService.processarComando(requisicao.getTexto()));
-    }
-
+    
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession sessao) {
         Usuario usuario = gerenciadorUsuarios.autenticar(
@@ -182,15 +187,15 @@ class AlterarSenhaRequest {
     }
 
 }
-
-class MensagemRequest {
+class MensagemRequest{
     private String texto;
 
-    public String getTexto() {
+    public String getTexto(){
         return texto;
     }
 
-    public void setTexto(String texto) {
+    public void setTexto(String texto){
         this.texto = texto;
     }
 }
+

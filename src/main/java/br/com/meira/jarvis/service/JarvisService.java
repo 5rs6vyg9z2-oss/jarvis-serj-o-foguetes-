@@ -3,6 +3,10 @@ package br.com.meira.jarvis.service;
 import br.com.meira.jarvis.model.Usuario;
 import br.com.meira.jarvis.util.Calculadora;
 import br.com.meira.jarvis.util.Datahora;
+
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.springframework.stereotype.Service;
 
 // Centraliza a interpretacao dos textos recebidos pela interface.
@@ -29,6 +33,9 @@ public class JarvisService {
         }
 
         switch (intencao) {
+
+            case "perguntaInutil":
+                return perguntaInutil();
 
             case "agradecerUsuario":
                 return agradecerUsuario();
@@ -281,6 +288,10 @@ public class JarvisService {
         return "ola! Eu sou o Jarvis. Como posso ajudar?";
     }
 
+    private String perguntaInutil(){
+        return escolherMensagem();
+    }
+
     private String responderPerguntaUsuario(){
         return "ta tudo bem sim,serei uma ia muito grande e forte!! voce e normal de perguntar se uma maquina esta bem ou mal?";
     }
@@ -295,6 +306,15 @@ public class JarvisService {
         }
 
         String texto = normalizarTexto(mensagem);
+
+        if (texto.contains("quem e voce")
+           || (texto.contains("qual ia voce e"))
+           || (texto.contains("voce e o jarvis ou outra ia"))
+           || (texto.contains("com quem to falando"))){
+            return "perguntaInutil";
+           }
+
+
 
            if (texto.contains("obrigado")
               || (texto.contains("voce e o melhor"))
@@ -426,5 +446,15 @@ public class JarvisService {
 
     private String respostaDesconhecida() {
         return "desculpa, ainda nao sei como responder a isso. Tente outro comando ou pergunte sobre hora, data, calculadora ou usuarios.";
+    }
+
+    private String escolherMensagem(){
+        List<String> mensagens = List.of(
+                "eu sou o jarvis, porque a pergunta?",
+                "eu sou o jarvis, sabe? a IA do homem de ferro?!",
+                "porque voce ta perguntando isso a um robo cara?");
+
+        int indiceAleatorio = ThreadLocalRandom.current().nextInt(mensagens.size());
+        return mensagens.get(indiceAleatorio);
     }
 }
