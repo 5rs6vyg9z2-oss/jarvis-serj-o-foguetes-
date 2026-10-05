@@ -29,9 +29,7 @@ public class JarvisController {
         return "Jarvis API ta on.";
     }
 
-
-   
-    ("/mensagem")
+    @PostMapping("/mensagem")
     public ResponseEntity<String> mensagem(
         @RequestBody MensagemRequest requisicao,
         HttpSession sessao){
@@ -55,12 +53,19 @@ public class JarvisController {
                 loginRequest.getSenha());
 
         if (usuario != null) {
+            sessao.removeAttribute("modoVisitante");
             sessao.setAttribute("usuarioEmail", usuario.getEmail());
             sessao.setAttribute("usuarioNome", usuario.getNome());
             return ResponseEntity.ok("Login bem-sucedido! Usuario: " + usuario.getNome());
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais invalidas.");
+    }
+
+    @PostMapping("/visitante")
+    public ResponseEntity<String> entrarComoVisitante(HttpSession sessao) {
+        sessao.setAttribute("modoVisitante", true);
+        return ResponseEntity.ok("Acesso como visitante iniciado.");
     }
 
     @PostMapping("/cadastro")
@@ -101,7 +106,8 @@ public class JarvisController {
     }
 
     private boolean sessaoAtiva(HttpSession sessao) {
-        return sessao.getAttribute("usuarioEmail") != null;
+        return sessao.getAttribute("usuarioEmail") != null
+                || Boolean.TRUE.equals(sessao.getAttribute("modoVisitante"));
     }
 }
 

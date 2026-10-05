@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto Jarvis</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 
 <body>
@@ -35,14 +35,82 @@
 </section>
       
     <main class="janela">
-        <section class="cabecalho">
-            <h1>Projeto Jarvis</h1>
-        </section>
+        <header class="cabecalho">
+            <div class="identidade-jarvis">
+                <span class="nucleo-jarvis" aria-hidden="true"><span>J</span></span>
+                <div>
+                    <h1>JARVIS</h1>
+                    <p>Assistente pessoal</p>
+                </div>
+            </div>
+            <div id="statusJarvis" class="status-jarvis" data-estado="conectando" role="status" aria-live="polite">
+                <span class="status-ponto" aria-hidden="true"></span>
+                <span id="textoStatusJarvis">Verificando</span>
+                <span class="onda-processamento" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </div>
+            <button type="button" id="botaoFoco" class="botao-foco" aria-pressed="false">Foco</button>
+            <button type="button" id="botaoAparencia" class="botao-aparencia" aria-haspopup="dialog" aria-controls="dialogoAparencia">Aparência</button>
+        </header>
+
+        <div class="faixa-sistema" aria-label="Estado do sistema">
+            <span class="indicador-sistema" id="indicadorApi" data-estado="conectando"><i></i><span>API verificando</span></span>
+            <span class="indicador-sistema indicador-sessao"><i></i><span>Sessão</span><strong id="modoSessao">Não autenticada</strong></span>
+            <span class="marca-painel">JARVIS / INTERFACE 01</span>
+        </div>
+
+        <dialog id="dialogoAparencia" class="dialogo-aparencia" aria-labelledby="tituloAparencia">
+            <div class="topo-dialogo">
+                <div>
+                    <h2 id="tituloAparencia">Personalizar aparência</h2>
+                    <p>Escolha uma combinação ou ajuste sua própria cor.</p>
+                </div>
+                <button type="button" id="fecharAparencia" class="botao-fechar-dialogo">Fechar</button>
+            </div>
+
+            <section class="secao-personalizacao" aria-labelledby="tituloTemas">
+                <h3 id="tituloTemas">Combinações prontas</h3>
+                <div class="grade-temas" role="group" aria-label="Combinações de cores">
+                    <button type="button" class="tema-pronto" data-tema="ciano" aria-pressed="true"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Ciano</span></button>
+                    <button type="button" class="tema-pronto" data-tema="violeta" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Violeta</span></button>
+                    <button type="button" class="tema-pronto" data-tema="esmeralda" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Esmeralda</span></button>
+                    <button type="button" class="tema-pronto" data-tema="coral" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Coral</span></button>
+                    <button type="button" class="tema-pronto" data-tema="ambar" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Âmbar</span></button>
+                    <button type="button" class="tema-pronto" data-tema="aurora" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Aurora</span></button>
+                    <button type="button" class="tema-pronto" data-tema="reator" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Reator</span></button>
+                    <button type="button" class="tema-pronto" data-tema="eclipse" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Eclipse</span></button>
+                    <button type="button" class="tema-pronto" data-tema="oceano" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Oceano</span></button>
+                    <button type="button" class="tema-pronto" data-tema="solar" aria-pressed="false"><span class="amostras-tema" aria-hidden="true"><span></span><span></span><span></span></span><span>Solar</span></button>
+                </div>
+            </section>
+
+            <section class="secao-personalizacao" aria-labelledby="tituloRgb">
+                <h3 id="tituloRgb">Espectro RGB</h3>
+                <p class="descricao-rgb">Ajuste vermelho, verde e azul. A prévia muda enquanto você arrasta.</p>
+                <div class="controle-rgb">
+                    <label for="controleVermelho">Vermelho <output id="valorVermelho">34</output></label>
+                    <input id="controleVermelho" type="range" min="0" max="255" value="34">
+                </div>
+                <div class="controle-rgb">
+                    <label for="controleVerde">Verde <output id="valorVerde">211</output></label>
+                    <input id="controleVerde" type="range" min="0" max="255" value="211">
+                </div>
+                <div class="controle-rgb">
+                    <label for="controleAzul">Azul <output id="valorAzul">238</output></label>
+                    <input id="controleAzul" type="range" min="0" max="255" value="238">
+                </div>
+                <div class="previa-cor"><span id="amostraCorAtual" aria-hidden="true"></span><output id="codigoHex">#22D3EE</output></div>
+            </section>
+
+            <div class="acoes-personalizacao">
+                <button type="button" id="restaurarAparencia" class="botao-restaurar">Restaurar padrão</button>
+                <button type="button" id="concluirAparencia" class="botao-concluir">Concluir</button>
+            </div>
+        </dialog>
 
         <section id="areaConversa" class="area-conversa">
-            <div class="mensagem jarvis">Jarvis: Ola! Eu sou o Jarvis, seu assistente virtual. Como posso ajuda-lo hoje?</div>
+            <div id="saudacaoJarvis" class="mensagem jarvis"><span class="assinatura-mensagem">JARVIS</span><span class="corpo-mensagem">Olá! Eu sou o Jarvis, seu assistente virtual. Como posso ajudar hoje?</span></div>
             <div id="indicadorPensando" class="mensagem jarvis" role="status" aria-live="polite" hidden>
-                Jarvis está processando...
+                <span class="assinatura-mensagem">JARVIS / ANÁLISE</span><span class="corpo-mensagem">Processando<span class="pontos-animados" aria-hidden="true">...</span><span class="onda-mensagem" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></span>
             </div>
         </section>
 
@@ -80,10 +148,12 @@
 
                 <button type="button" id="botaoMostrarLogin">Ja tenho conta</button>
             </div>
+            <p id="mensagemVisitante" class="mensagem-formulario" aria-live="polite"></p>
+            <button type="button" id="botaoVisitante" class="botao-visitante">Continuar como visitante</button>
         </div>
     </div>
 
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=9"></script>
 </body>
 
 
