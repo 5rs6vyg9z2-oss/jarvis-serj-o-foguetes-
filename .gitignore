@@ -3,3 +3,4 @@ classpath.txt
 *.db
 .env
 *.env
+models/

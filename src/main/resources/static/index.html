@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto Jarvis</title>
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=15">
 </head>
 
 <body>
@@ -57,6 +57,37 @@
             <span class="indicador-sistema indicador-sessao"><i></i><span>Sessão</span><strong id="modoSessao">Não autenticada</strong></span>
             <span class="marca-painel">JARVIS / INTERFACE 01</span>
         </div>
+
+        <dialog id="dialogoVoz" class="dialogo-voz" aria-labelledby="tituloVoz">
+            <div class="topo-dialogo">
+                <div>
+                    <h2 id="tituloVoz">Conversa por voz</h2>
+                    <p>Fale normalmente. Apos 1 segundo de silencio, o audio sera enviado ao Groq para transcricao.</p>
+                </div>
+                <button type="button" id="fecharVoz" class="botao-fechar-dialogo">Fechar</button>
+            </div>
+
+            <div id="esferaVoz" class="esfera-voz" data-estado="pronto" role="img" aria-label="Jarvis pronto">
+                <span class="j-esfera">J</span>
+            </div>
+            <p id="statusVoz" class="status-voz" role="status" aria-live="polite">Pronto para ouvir</p>
+            <p id="transcricaoVoz" class="transcricao-voz" aria-live="polite">A transcricao aparecera aqui.</p>
+
+            <label class="opcao-voz" for="respostaEmVoz">
+                <input type="checkbox" id="respostaEmVoz" checked>
+                Ler as respostas em voz alta
+            </label>
+
+            <label class="opcao-voz" for="conversaContinua">
+                <input type="checkbox" id="conversaContinua">
+                Continuar ouvindo após cada resposta
+            </label>
+
+            <div class="acoes-voz">
+                <button type="button" id="botaoOuvir" class="botao-concluir">Comecar a falar</button>
+                <button type="button" id="botaoPararVoz" class="botao-fechar-dialogo" disabled>Parar conversa</button>
+            </div>
+        </dialog>
 
         <dialog id="dialogoAparencia" class="dialogo-aparencia" aria-labelledby="tituloAparencia">
             <div class="topo-dialogo">
@@ -115,6 +146,12 @@
         </section>
 
         <form id="formMensagem" class="form-mensagem">
+            <button type="button" id="botaoMicrofone" class="botao-microfone" aria-label="Iniciar conversa por voz" aria-pressed="false" aria-haspopup="dialog" aria-controls="dialogoVoz" title="Conversar por voz">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+                    <path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"></path>
+                </svg>
+            </button>
             <input type="text" id="campoMensagem" placeholder="Digite sua mensagem...">
             <button type="submit">Enviar</button>
         </form>
@@ -153,7 +190,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=19"></script>
 </body>
 
 

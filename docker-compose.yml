@@ -10,6 +10,25 @@ services:
       - "5432:5432"
     volumes:
       - jarvis_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  jarvis:
+    build: .
+    container_name: jarvis_app_local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      GROQ_API_KEY: ${GROQ_API_KEY:?Defina GROQ_API_KEY no ambiente antes de iniciar o Jarvis}
 
 volumes:
   jarvis_postgres_data:
