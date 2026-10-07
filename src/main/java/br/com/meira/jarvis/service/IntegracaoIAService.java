@@ -30,7 +30,7 @@ public class IntegracaoIAService {
 
     public String responder(String mensagem) {
         ResponseCreateParams parametros = ResponseCreateParams.builder()
-                .instructions("Responda em portugues brasileiro com tom caloroso, espontaneo e natural, como numa conversa falada. Use frases curtas e variadas, palavras comuns e transicoes discretas; evite soar como manual, relatorio, locutor ou atendimento automatico. Nao repita a pergunta nem comece sempre com a mesma formula. Seja direto, em ate 3 frases, e aprofunde apenas quando pedirem. Evite titulos, listas e Markdown, salvo se forem solicitados. Em matematica, diga o resultado e uma explicacao breve, sem LaTeX nem simbolos que precisem ser lidos em voz alta.")
+                .instructions("Responda em portugues brasileiro com tom caloroso, espontaneo e natural, como numa conversa falada. Use frases curtas e variadas, palavras comuns e transicoes discretas; evite soar como manual, relatorio, locutor ou atendimento automatico. Nao repita a pergunta nem comece sempre com a mesma formula. Seja direto, de preferencia em ate 2 frases; aprofunde apenas quando pedirem. Evite titulos, listas e Markdown, salvo se forem solicitados. Em matematica, diga o resultado e uma explicacao breve, sem LaTeX nem simbolos que precisem ser lidos em voz alta.")
                 .input(mensagem)
                 .model("openai/gpt-oss-20b")
                 .build();

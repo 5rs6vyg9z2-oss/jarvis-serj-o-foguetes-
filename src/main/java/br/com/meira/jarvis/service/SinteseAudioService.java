@@ -16,11 +16,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import jakarta.annotation.PreDestroy;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SinteseAudioService {
+    private static final System.Logger LOGGER = System.getLogger(SinteseAudioService.class.getName());
     private static final int LIMITE_CARACTERES = 5000;
     private static final long TEMPO_LIMITE_SEGUNDOS = 60;
 
@@ -74,6 +77,19 @@ public class SinteseAudioService {
             encerrarWorker();
             throw new IllegalStateException("Nao foi possivel comunicar com o sintetizador.", erro);
         }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void aquecerModeloEmSegundoPlano() {
+        Thread.ofVirtual().name("jarvis-tts-warmup").start(() -> {
+            try {
+                sintetizar("Jarvis pronto.");
+            } catch (RuntimeException erro) {
+                LOGGER.log(System.Logger.Level.WARNING,
+                        "Nao foi possivel pre-aquecer a voz; a primeira sintese pode demorar mais: {0}",
+                        erro.getMessage());
+            }
+        });
     }
 
     private void validarArquivos() {

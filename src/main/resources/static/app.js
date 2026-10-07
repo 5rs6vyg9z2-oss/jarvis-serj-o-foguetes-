@@ -15,8 +15,6 @@ const statusVoz = document.getElementById('statusVoz');
 const transcricaoVoz = document.getElementById('transcricaoVoz');
 const botaoOuvir = document.getElementById('botaoOuvir');
 const botaoPararVoz = document.getElementById('botaoPararVoz');
-const respostaEmVoz = document.getElementById('respostaEmVoz');
-const conversaContinua = document.getElementById('conversaContinua');
 const dialogoAparencia = document.getElementById('dialogoAparencia');
 const botoesTema = document.querySelectorAll('.tema-pronto');
 const controlesRgb = {
@@ -56,7 +54,7 @@ function atualizarControlesVoz() {
     botaoOuvir.disabled = !navigator.mediaDevices?.getUserMedia
             || typeof MediaRecorder === 'undefined'
             || aguardandoRespostaVoz;
-    botaoOuvir.textContent = capturandoAudio ? 'Enviar agora' : 'Comecar a falar';
+    botaoOuvir.textContent = capturandoAudio ? 'Enviar agora' : 'Começar a falar';
     botaoPararVoz.disabled = !modoVozAtivo;
 }
 
@@ -271,7 +269,7 @@ function enviarAudioParaJarvis(gravacao) {
             aguardandoRespostaVoz = false;
             atualizarEsferaVoz('erro', erro.message || 'Nao consegui enviar o audio ao Groq.');
             atualizarControlesVoz();
-            if (modoVozAtivo && conversaContinua.checked) {
+            if (modoVozAtivo) {
                 window.setTimeout(iniciarCapturaVoz, 1200);
             }
         });
@@ -299,13 +297,9 @@ function finalizarTurnoVoz() {
     aguardandoRespostaVoz = false;
     if (!modoVozAtivo) return;
 
-    if (conversaContinua.checked) {
-        atualizarEsferaVoz('pronto', 'Resposta concluída. Pode falar novamente.');
-        window.setTimeout(iniciarCapturaVoz, 450);
-    } else {
-        atualizarEsferaVoz('pronto', 'Pronto para ouvir novamente');
-        atualizarControlesVoz();
-    }
+    atualizarEsferaVoz('pronto', 'Resposta concluída. Pode falar novamente.');
+    atualizarControlesVoz();
+    window.setTimeout(iniciarCapturaVoz, 150);
 }
 
 function limparAudioResposta() {
@@ -463,6 +457,7 @@ formMensagem.addEventListener('submit', function(event) {
     indicadorPensando.hidden = false;
     areaConversa.scrollTop = areaConversa.scrollHeight;
     atualizarStatusJarvis('processando', 'Analisando');
+    if (modoVozAtivo) atualizarEsferaVoz('pensando', 'Jarvis está pensando');
     campoMensagem.disabled = true;
     botaoEnviar.disabled = true;
 
@@ -486,7 +481,7 @@ formMensagem.addEventListener('submit', function(event) {
         atualizarStatusJarvis('pronto', 'Pronto');
         atualizarEstadoApi(true);
         adicionarMensagem('jarvis', respostaJarvis);
-        if (modoVozAtivo && respostaEmVoz.checked) falarResposta(respostaJarvis);
+        if (modoVozAtivo) falarResposta(respostaJarvis);
         else finalizarTurnoVoz();
     })
     .catch(erro => {
@@ -498,7 +493,7 @@ formMensagem.addEventListener('submit', function(event) {
             aguardandoRespostaVoz = false;
             atualizarEsferaVoz('erro', 'Não consegui enviar a mensagem');
             atualizarControlesVoz();
-            if (conversaContinua.checked) window.setTimeout(iniciarCapturaVoz, 1200);
+            window.setTimeout(iniciarCapturaVoz, 1200);
         }
     })
     .finally(() => {

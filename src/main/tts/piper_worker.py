@@ -19,15 +19,15 @@ from piper.voice import PiperVoice
 
 def gerar_wav(voz, texto):
     configuracao = SynthesisConfig(
-        length_scale=1.02,
+        length_scale=0.96,
         noise_scale=0.667,
-        noise_w_scale=0.9,
+        noise_w_scale=0.8,
     )
     blocos = [bloco.audio_int16_array for bloco in voz.synthesize(texto, configuracao)]
     if not blocos:
         raise RuntimeError("Piper generated no audio")
 
-    pausa = np.zeros(int(0.3 * voz.config.sample_rate), dtype=np.int16)
+    pausa = np.zeros(int(0.25 * voz.config.sample_rate), dtype=np.int16)
     partes = []
     for indice, bloco in enumerate(blocos):
         if indice:

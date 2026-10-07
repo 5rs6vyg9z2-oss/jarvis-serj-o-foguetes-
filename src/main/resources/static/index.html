@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto Jarvis</title>
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 
 <body>
@@ -59,32 +59,33 @@
         </div>
 
         <dialog id="dialogoVoz" class="dialogo-voz" aria-labelledby="tituloVoz">
-            <div class="topo-dialogo">
-                <div>
+            <div class="topo-dialogo topo-dialogo-voz">
+                <div class="identidade-voz">
+                    <span class="rotulo-voz">JARVIS / AUDIO INTERFACE</span>
                     <h2 id="tituloVoz">Conversa por voz</h2>
-                    <p>Fale normalmente. Apos 1 segundo de silencio, o audio sera enviado ao Groq para transcricao.</p>
+                    <p>Conversa por voz com escuta contínua.</p>
                 </div>
-                <button type="button" id="fecharVoz" class="botao-fechar-dialogo">Fechar</button>
+                <button type="button" id="fecharVoz" class="botao-fechar-dialogo" aria-label="Fechar conversa por voz">Fechar</button>
             </div>
 
-            <div id="esferaVoz" class="esfera-voz" data-estado="pronto" role="img" aria-label="Jarvis pronto">
-                <span class="j-esfera">J</span>
+            <div class="palco-voz">
+                <span class="sinal-voz"><i aria-hidden="true"></i> SISTEMA DE VOZ</span>
+                <div id="esferaVoz" class="esfera-voz" data-estado="pronto" role="img" aria-label="Jarvis pronto">
+                    <span class="halo-esfera" aria-hidden="true"></span>
+                    <span class="j-esfera">J</span>
+                </div>
+                <p id="statusVoz" class="status-voz" role="status" aria-live="polite">Pronto para ouvir</p>
             </div>
-            <p id="statusVoz" class="status-voz" role="status" aria-live="polite">Pronto para ouvir</p>
-            <p id="transcricaoVoz" class="transcricao-voz" aria-live="polite">A transcricao aparecera aqui.</p>
 
-            <label class="opcao-voz" for="respostaEmVoz">
-                <input type="checkbox" id="respostaEmVoz" checked>
-                Ler as respostas em voz alta
-            </label>
+            <div class="transcricao-voz-painel">
+                <span class="rotulo-transcricao">TRANSCRIÇÃO</span>
+                <p id="transcricaoVoz" class="transcricao-voz" aria-live="polite">Sua fala reconhecida aparecerá aqui.</p>
+            </div>
 
-            <label class="opcao-voz" for="conversaContinua">
-                <input type="checkbox" id="conversaContinua">
-                Continuar ouvindo após cada resposta
-            </label>
+            <div class="estado-continuo"><i aria-hidden="true"></i><span>Resposta falada e escuta contínua ativadas</span></div>
 
             <div class="acoes-voz">
-                <button type="button" id="botaoOuvir" class="botao-concluir">Comecar a falar</button>
+                <button type="button" id="botaoOuvir" class="botao-concluir">Começar a falar</button>
                 <button type="button" id="botaoPararVoz" class="botao-fechar-dialogo" disabled>Parar conversa</button>
             </div>
         </dialog>
@@ -190,7 +191,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=19"></script>
+    <script src="app.js?v=20"></script>
 </body>
 
 
